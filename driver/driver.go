@@ -1,1 +1,68 @@
 package driver
+
+import (
+	"context"
+	"fmt"
+	"log"
+	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+type DB struct {
+	NoSql      *mongo.Client
+	Connection *options.ClientOptions
+}
+
+var dbConn = &DB{}
+
+const maxOpenDBConn = 10
+const maxIdleDBCon = 5
+const maxDBLifeTime = 5 * time.Minute
+
+func ConnectMongoDB() (*DB, error) {
+	// Set client options
+	clientOptions := NewDatabase("mongodb://localhost:27017")
+
+	clientOptions.SetMaxConnIdleTime(maxIdleDBCon)
+	clientOptions.SetMaxConnecting(uint64(maxDBLifeTime))
+	clientOptions.SetMaxConnecting(maxOpenDBConn)
+
+	dbConn.Connection = clientOptions
+	// Connect to MongoDB
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, clientOptions)
+	if err != nil {
+		log.Fatal(err)
+		return nil, err
+	}
+
+	dbConn.NoSql = client
+	fmt.Println("Connected to MongoDB!")
+
+	err = testDB(dbConn.NoSql)
+	if err != nil {
+		return nil, err
+	}
+
+	return dbConn, err
+}
+
+// Check the connection
+func testDB(client *mongo.Client) error {
+	err := client.Ping(context.TODO(), nil)
+
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
+func NewDatabase(dns string) *options.ClientOptions {
+	db := options.Client().ApplyURI(dns)
+
+	return db
+}
