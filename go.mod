@@ -5,6 +5,7 @@ go 1.18
 require go.mongodb.org/mongo-driver v1.9.1
 
 require (
+	github.com/go-chi/chi v1.5.4
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/klauspost/compress v1.15.6 // indirect
