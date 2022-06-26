@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/lazyspell/profile_backend/config"
 	"github.com/lazyspell/profile_backend/driver"
 	"github.com/lazyspell/profile_backend/repository"
 	"github.com/lazyspell/profile_backend/repository/dbrepo"
@@ -9,10 +10,11 @@ import (
 var Repo *Repository
 
 type Repository struct {
-	DB repository.DatabaseRepo
+	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
-func NewRepo(db *driver.DB) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		DB: dbrepo.NewMongoRepo(db.NoSql),
 	}
