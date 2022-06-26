@@ -30,16 +30,17 @@ func ConnectMongoDB() (*DB, error) {
 	clientOptions.SetMaxConnecting(maxOpenDBConn)
 
 	dbConn.Connection = clientOptions
+
 	// Connect to MongoDB
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, clientOptions)
+
+	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		log.Fatal(err)
 		return nil, err
 	}
 
 	dbConn.NoSql = client
+
 	fmt.Println("Connected to MongoDB!")
 
 	err = testDB(dbConn.NoSql)
