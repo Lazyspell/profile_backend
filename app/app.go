@@ -1,13 +1,16 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/lazyspell/profile_backend/config"
 	"github.com/lazyspell/profile_backend/driver"
 	"github.com/lazyspell/profile_backend/handlers"
+	"github.com/lazyspell/profile_backend/helpers"
 	r "github.com/lazyspell/profile_backend/routes"
 )
 
@@ -17,10 +20,15 @@ var app config.AppConfig
 
 func Start() {
 	fmt.Println("Application has started")
-	_, err := run()
+
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	client, err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer client.NoSql.Disconnect(ctx)
+
+	fmt.Println("Connected to MongoDB!")
 
 	fmt.Println(fmt.Sprintf("Starting application on http://localhost:8080"))
 
@@ -43,6 +51,7 @@ func run() (*driver.DB, error) {
 
 	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandler(repo)
+	helpers.NewHelpers(&app)
 
 	return db, nil
 
