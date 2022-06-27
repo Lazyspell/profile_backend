@@ -1,5 +1,7 @@
 package repository
 
+import "github.com/lazyspell/profile_backend/models"
+
 type DatabaseRepo interface {
-	AllProfiles()
+	AllProfiles() ([]models.Profile, error)
 }
