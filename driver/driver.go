@@ -2,7 +2,6 @@ package driver
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -40,8 +39,6 @@ func ConnectMongoDB() (*DB, error) {
 	}
 
 	dbConn.NoSql = client
-
-	fmt.Println("Connected to MongoDB!")
 
 	err = testDB(dbConn.NoSql)
 	if err != nil {
