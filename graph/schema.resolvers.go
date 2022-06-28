@@ -5,6 +5,7 @@ package graph
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 
 	"github.com/lazyspell/profile_backend/graph/generated"
@@ -12,7 +13,24 @@ import (
 )
 
 func (r *mutationResolver) CreateProfile(ctx context.Context, input model.NewProfile) (*model.Profile, error) {
-	panic(fmt.Errorf("not implemented"))
+
+	var names *model.Name
+	names.FirstName = *input.FirstName
+	names.LastName = *input.LastName
+
+	var location *model.Location
+	location.State = *input.State
+	location.City = *input.City
+	location.ZipCode = *input.ZipCode
+
+	profiles := model.Profile{
+		ID:          fmt.Sprintf("T%d", rand.Int()),
+		Name:        names,
+		Location:    location,
+		Email:       *input.Email,
+		Skills:      []*model.Skill{},
+		Description: *input.Description,
+	}
 }
 
 // Mutation returns generated.MutationResolver implementation.
