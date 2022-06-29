@@ -2,7 +2,7 @@
 #
 # https://gqlgen.com/getting-started/
 
-type Profile {
+type ProfileQL {
     id: ID!
     name: Name!
     location: Location!
@@ -38,6 +38,10 @@ input NewProfile {
     description: String
 }
 
+type Query {
+    profile: [ProfileQL!]!
+}
+
 type Mutation {
-    createProfile(input: NewProfile!): Profile!
+    createProfile(input: NewProfile!): ProfileQL!
 }
