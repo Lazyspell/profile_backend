@@ -23,7 +23,7 @@ type NewProfile struct {
 	Description *string `json:"description"`
 }
 
-type Profile struct {
+type ProfileQl struct {
 	ID          string    `json:"id"`
 	Name        *Name     `json:"name"`
 	Location    *Location `json:"location"`

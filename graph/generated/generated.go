@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"strconv"
 	"sync"
+	"sync/atomic"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
@@ -36,6 +37,7 @@ type Config struct {
 
 type ResolverRoot interface {
 	Mutation() MutationResolver
+	Query() QueryResolver
 }
 
 type DirectiveRoot struct {
@@ -57,7 +59,7 @@ type ComplexityRoot struct {
 		LastName  func(childComplexity int) int
 	}
 
-	Profile struct {
+	ProfileQL struct {
 		Description func(childComplexity int) int
 		Email       func(childComplexity int) int
 		ID          func(childComplexity int) int
@@ -67,6 +69,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
+		Profile func(childComplexity int) int
 	}
 
 	Skill struct {
@@ -77,7 +80,10 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateProfile(ctx context.Context, input model.NewProfile) (*model.Profile, error)
+	CreateProfile(ctx context.Context, input model.NewProfile) (*model.ProfileQl, error)
+}
+type QueryResolver interface {
+	Profile(ctx context.Context) ([]*model.ProfileQl, error)
 }
 
 type executableSchema struct {
@@ -142,47 +148,54 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Name.LastName(childComplexity), true
 
-	case "Profile.description":
-		if e.complexity.Profile.Description == nil {
+	case "ProfileQL.description":
+		if e.complexity.ProfileQL.Description == nil {
 			break
 		}
 
-		return e.complexity.Profile.Description(childComplexity), true
+		return e.complexity.ProfileQL.Description(childComplexity), true
 
-	case "Profile.email":
-		if e.complexity.Profile.Email == nil {
+	case "ProfileQL.email":
+		if e.complexity.ProfileQL.Email == nil {
 			break
 		}
 
-		return e.complexity.Profile.Email(childComplexity), true
+		return e.complexity.ProfileQL.Email(childComplexity), true
 
-	case "Profile.id":
-		if e.complexity.Profile.ID == nil {
+	case "ProfileQL.id":
+		if e.complexity.ProfileQL.ID == nil {
 			break
 		}
 
-		return e.complexity.Profile.ID(childComplexity), true
+		return e.complexity.ProfileQL.ID(childComplexity), true
 
-	case "Profile.location":
-		if e.complexity.Profile.Location == nil {
+	case "ProfileQL.location":
+		if e.complexity.ProfileQL.Location == nil {
 			break
 		}
 
-		return e.complexity.Profile.Location(childComplexity), true
+		return e.complexity.ProfileQL.Location(childComplexity), true
 
-	case "Profile.name":
-		if e.complexity.Profile.Name == nil {
+	case "ProfileQL.name":
+		if e.complexity.ProfileQL.Name == nil {
 			break
 		}
 
-		return e.complexity.Profile.Name(childComplexity), true
+		return e.complexity.ProfileQL.Name(childComplexity), true
 
-	case "Profile.skills":
-		if e.complexity.Profile.Skills == nil {
+	case "ProfileQL.skills":
+		if e.complexity.ProfileQL.Skills == nil {
 			break
 		}
 
-		return e.complexity.Profile.Skills(childComplexity), true
+		return e.complexity.ProfileQL.Skills(childComplexity), true
+
+	case "Query.profile":
+		if e.complexity.Query.Profile == nil {
+			break
+		}
+
+		return e.complexity.Query.Profile(childComplexity), true
 
 	case "Skill.Description":
 		if e.complexity.Skill.Description == nil {
@@ -278,7 +291,7 @@ var sources = []*ast.Source{
 #
 # https://gqlgen.com/getting-started/
 
-type Profile {
+type ProfileQL {
     id: ID!
     name: Name!
     location: Location!
@@ -314,8 +327,12 @@ input NewProfile {
     description: String
 }
 
+type Query {
+    profile: [ProfileQL!]!
+}
+
 type Mutation {
-    createProfile(input: NewProfile!): Profile!
+    createProfile(input: NewProfile!): ProfileQL!
 }
 `, BuiltIn: false},
 }
@@ -551,9 +568,9 @@ func (ec *executionContext) _Mutation_createProfile(ctx context.Context, field g
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.Profile)
+	res := resTmp.(*model.ProfileQl)
 	fc.Result = res
-	return ec.marshalNProfile2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfile(ctx, field.Selections, res)
+	return ec.marshalNProfileQL2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfileQl(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createProfile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -565,19 +582,19 @@ func (ec *executionContext) fieldContext_Mutation_createProfile(ctx context.Cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Profile_id(ctx, field)
+				return ec.fieldContext_ProfileQL_id(ctx, field)
 			case "name":
-				return ec.fieldContext_Profile_name(ctx, field)
+				return ec.fieldContext_ProfileQL_name(ctx, field)
 			case "location":
-				return ec.fieldContext_Profile_location(ctx, field)
+				return ec.fieldContext_ProfileQL_location(ctx, field)
 			case "email":
-				return ec.fieldContext_Profile_email(ctx, field)
+				return ec.fieldContext_ProfileQL_email(ctx, field)
 			case "skills":
-				return ec.fieldContext_Profile_skills(ctx, field)
+				return ec.fieldContext_ProfileQL_skills(ctx, field)
 			case "description":
-				return ec.fieldContext_Profile_description(ctx, field)
+				return ec.fieldContext_ProfileQL_description(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Profile", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type ProfileQL", field.Name)
 		},
 	}
 	defer func() {
@@ -682,8 +699,8 @@ func (ec *executionContext) fieldContext_Name_last_name(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Profile_id(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Profile_id(ctx, field)
+func (ec *executionContext) _ProfileQL_id(ctx context.Context, field graphql.CollectedField, obj *model.ProfileQl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProfileQL_id(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -713,9 +730,9 @@ func (ec *executionContext) _Profile_id(ctx context.Context, field graphql.Colle
 	return ec.marshalNID2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Profile_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProfileQL_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Profile",
+		Object:     "ProfileQL",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -726,8 +743,8 @@ func (ec *executionContext) fieldContext_Profile_id(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Profile_name(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Profile_name(ctx, field)
+func (ec *executionContext) _ProfileQL_name(ctx context.Context, field graphql.CollectedField, obj *model.ProfileQl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProfileQL_name(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -757,9 +774,9 @@ func (ec *executionContext) _Profile_name(ctx context.Context, field graphql.Col
 	return ec.marshalNName2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐName(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Profile_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProfileQL_name(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Profile",
+		Object:     "ProfileQL",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -776,8 +793,8 @@ func (ec *executionContext) fieldContext_Profile_name(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Profile_location(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Profile_location(ctx, field)
+func (ec *executionContext) _ProfileQL_location(ctx context.Context, field graphql.CollectedField, obj *model.ProfileQl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProfileQL_location(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -807,9 +824,9 @@ func (ec *executionContext) _Profile_location(ctx context.Context, field graphql
 	return ec.marshalNLocation2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐLocation(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Profile_location(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProfileQL_location(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Profile",
+		Object:     "ProfileQL",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -828,8 +845,8 @@ func (ec *executionContext) fieldContext_Profile_location(ctx context.Context, f
 	return fc, nil
 }
 
-func (ec *executionContext) _Profile_email(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Profile_email(ctx, field)
+func (ec *executionContext) _ProfileQL_email(ctx context.Context, field graphql.CollectedField, obj *model.ProfileQl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProfileQL_email(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -859,9 +876,9 @@ func (ec *executionContext) _Profile_email(ctx context.Context, field graphql.Co
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Profile_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProfileQL_email(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Profile",
+		Object:     "ProfileQL",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -872,8 +889,8 @@ func (ec *executionContext) fieldContext_Profile_email(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Profile_skills(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Profile_skills(ctx, field)
+func (ec *executionContext) _ProfileQL_skills(ctx context.Context, field graphql.CollectedField, obj *model.ProfileQl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProfileQL_skills(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -900,9 +917,9 @@ func (ec *executionContext) _Profile_skills(ctx context.Context, field graphql.C
 	return ec.marshalOSkill2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐSkill(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Profile_skills(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProfileQL_skills(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Profile",
+		Object:     "ProfileQL",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
@@ -921,8 +938,8 @@ func (ec *executionContext) fieldContext_Profile_skills(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _Profile_description(ctx context.Context, field graphql.CollectedField, obj *model.Profile) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Profile_description(ctx, field)
+func (ec *executionContext) _ProfileQL_description(ctx context.Context, field graphql.CollectedField, obj *model.ProfileQl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProfileQL_description(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -952,14 +969,72 @@ func (ec *executionContext) _Profile_description(ctx context.Context, field grap
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Profile_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_ProfileQL_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
-		Object:     "Profile",
+		Object:     "ProfileQL",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_profile(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_profile(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().Profile(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]*model.ProfileQl)
+	fc.Result = res
+	return ec.marshalNProfileQL2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfileQlᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Query_profile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ProfileQL_id(ctx, field)
+			case "name":
+				return ec.fieldContext_ProfileQL_name(ctx, field)
+			case "location":
+				return ec.fieldContext_ProfileQL_location(ctx, field)
+			case "email":
+				return ec.fieldContext_ProfileQL_email(ctx, field)
+			case "skills":
+				return ec.fieldContext_ProfileQL_skills(ctx, field)
+			case "description":
+				return ec.fieldContext_ProfileQL_description(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProfileQL", field.Name)
 		},
 	}
 	return fc, nil
@@ -3194,51 +3269,51 @@ func (ec *executionContext) _Name(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
-var profileImplementors = []string{"Profile"}
+var profileQLImplementors = []string{"ProfileQL"}
 
-func (ec *executionContext) _Profile(ctx context.Context, sel ast.SelectionSet, obj *model.Profile) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, profileImplementors)
+func (ec *executionContext) _ProfileQL(ctx context.Context, sel ast.SelectionSet, obj *model.ProfileQl) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, profileQLImplementors)
 	out := graphql.NewFieldSet(fields)
 	var invalids uint32
 	for i, field := range fields {
 		switch field.Name {
 		case "__typename":
-			out.Values[i] = graphql.MarshalString("Profile")
+			out.Values[i] = graphql.MarshalString("ProfileQL")
 		case "id":
 
-			out.Values[i] = ec._Profile_id(ctx, field, obj)
+			out.Values[i] = ec._ProfileQL_id(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "name":
 
-			out.Values[i] = ec._Profile_name(ctx, field, obj)
+			out.Values[i] = ec._ProfileQL_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "location":
 
-			out.Values[i] = ec._Profile_location(ctx, field, obj)
+			out.Values[i] = ec._ProfileQL_location(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "email":
 
-			out.Values[i] = ec._Profile_email(ctx, field, obj)
+			out.Values[i] = ec._ProfileQL_email(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
 		case "skills":
 
-			out.Values[i] = ec._Profile_skills(ctx, field, obj)
+			out.Values[i] = ec._ProfileQL_skills(ctx, field, obj)
 
 		case "description":
 
-			out.Values[i] = ec._Profile_description(ctx, field, obj)
+			out.Values[i] = ec._ProfileQL_description(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -3273,6 +3348,29 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
+		case "profile":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_profile(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx, innerFunc)
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return rrm(innerCtx)
+			})
 		case "__type":
 
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
@@ -3726,18 +3824,62 @@ func (ec *executionContext) unmarshalNNewProfile2githubᚗcomᚋlazyspellᚋprof
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNProfile2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfile(ctx context.Context, sel ast.SelectionSet, v model.Profile) graphql.Marshaler {
-	return ec._Profile(ctx, sel, &v)
+func (ec *executionContext) marshalNProfileQL2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfileQl(ctx context.Context, sel ast.SelectionSet, v model.ProfileQl) graphql.Marshaler {
+	return ec._ProfileQL(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNProfile2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfile(ctx context.Context, sel ast.SelectionSet, v *model.Profile) graphql.Marshaler {
+func (ec *executionContext) marshalNProfileQL2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfileQlᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.ProfileQl) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNProfileQL2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfileQl(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNProfileQL2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfileQl(ctx context.Context, sel ast.SelectionSet, v *model.ProfileQl) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._Profile(ctx, sel, v)
+	return ec._ProfileQL(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
