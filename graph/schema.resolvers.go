@@ -14,16 +14,7 @@ import (
 
 func (r *mutationResolver) CreateProfile(ctx context.Context, input model.NewProfile) (*model.ProfileQl, error) {
 
-	var names model.Name
-	names.FirstName = *input.FirstName
-	names.LastName = *input.LastName
-
-	var location model.Location
-	location.State = *input.State
-	location.City = *input.City
-	location.ZipCode = *input.ZipCode
-
-	ProfileID := strconv.Itoa(rand.Intn(1000000)) + names.FirstName
+	ProfileID := *input.FirstName + strconv.Itoa(rand.Intn(1000000))
 
 	profiles := &model.ProfileQl{
 		ID:          ProfileID,
