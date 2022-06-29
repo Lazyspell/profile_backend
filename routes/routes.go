@@ -12,9 +12,9 @@ func Routes(app *config.AppConfig) http.Handler {
 
 	mux := chi.NewRouter()
 
-	mux.Get("/", handlers.Repo.Working)
+	mux.Post("/profiles/new", handlers.Repo.InsertProfiles)
 
-	mux.Get("/testing", handlers.Repo.GetAllProfiles)
+	mux.Get("/profiles/all", handlers.Repo.GetAllProfiles)
 
 	return mux
 }

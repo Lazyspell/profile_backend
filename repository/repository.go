@@ -3,5 +3,7 @@ package repository
 import "github.com/lazyspell/profile_backend/models"
 
 type DatabaseRepo interface {
-	AllProfiles() ([]models.Profile, error)
+	//profiles
+	AllProfilesDB() ([]models.Profile, error)
+	InsertProfilesDB(profile models.Profile) (string, error)
 }

@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func (m *mongoDBRepo) AllProfiles() ([]models.Profile, error) {
+func (m *mongoDBRepo) AllProfilesDB() ([]models.Profile, error) {
 
 	var results []models.Profile
 
@@ -25,5 +25,19 @@ func (m *mongoDBRepo) AllProfiles() ([]models.Profile, error) {
 	}
 
 	return results, nil
+
+}
+
+func (m *mongoDBRepo) InsertProfilesDB(profile models.Profile) (string, error) {
+
+	coll := m.DB.Database("profiletest").Collection("profile")
+
+	_, err := coll.InsertOne(context.TODO(), profile)
+	if err != nil {
+		log.Println(err)
+		return "failed", err
+	}
+
+	return "success", nil
 
 }
