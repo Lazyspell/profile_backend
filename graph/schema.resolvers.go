@@ -10,7 +10,10 @@ import (
 
 	"github.com/lazyspell/profile_backend/graph/generated"
 	"github.com/lazyspell/profile_backend/graph/model"
+	"github.com/lazyspell/profile_backend/repository"
 )
+
+var profileRepo repository.ProfileRepository = repository.New()
 
 func (r *mutationResolver) CreateProfile(ctx context.Context, input model.NewProfile) (*model.ProfileQl, error) {
 
@@ -24,12 +27,14 @@ func (r *mutationResolver) CreateProfile(ctx context.Context, input model.NewPro
 		Skills:      []*model.Skill{},
 		Description: *input.Description,
 	}
-	r.profile = append(r.profile, profiles)
+	profileRepo.Save(profiles)
 	return profiles, nil
 }
 
 func (r *queryResolver) Profile(ctx context.Context) ([]*model.ProfileQl, error) {
-	return r.profile, nil
+	profiles := profileRepo.FindAll()
+
+	return profiles, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

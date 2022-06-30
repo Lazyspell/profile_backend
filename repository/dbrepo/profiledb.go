@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/lazyspell/profile_backend/graph/model"
 	"github.com/lazyspell/profile_backend/models"
 	"go.mongodb.org/mongo-driver/bson"
 )
@@ -39,5 +40,25 @@ func (m *mongoDBRepo) InsertProfilesDB(profile models.Profile) (string, error) {
 	}
 
 	return "success", nil
+
+}
+
+func (m *mongoDBRepo) AllProfilesQL() ([]*model.ProfileQl, error) {
+
+	var results []*model.ProfileQl
+
+	coll := m.DB.Database("profiletest").Collection("profile")
+
+	cursor, err := coll.Find(context.TODO(), bson.D{})
+	if err != nil {
+		log.Println(err)
+		return results, err
+
+	}
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		panic(err)
+	}
+
+	return results, nil
 
 }
