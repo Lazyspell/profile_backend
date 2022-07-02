@@ -31,7 +31,7 @@ func (r *mutationResolver) CreateProfile(ctx context.Context, input model.NewPro
 }
 
 func (r *queryResolver) Profile(ctx context.Context) ([]*model.ProfileQl, error) {
-	profiles, err := handlers.Repo.FindAll()
+	profiles, err := handlers.Repo.GetAllProfilesQL()
 	if err != nil {
 		return profiles, err
 	}
