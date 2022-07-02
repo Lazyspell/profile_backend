@@ -5,19 +5,18 @@ package graph
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"strconv"
 
 	"github.com/lazyspell/profile_backend/graph/generated"
 	"github.com/lazyspell/profile_backend/graph/model"
-	"github.com/lazyspell/profile_backend/repository"
+	"github.com/lazyspell/profile_backend/handlers"
 )
-
-var profileRepo repository.ProfileRepository = repository.New()
 
 func (r *mutationResolver) CreateProfile(ctx context.Context, input model.NewProfile) (*model.ProfileQl, error) {
 
-	ProfileID := *input.FirstName + strconv.Itoa(rand.Intn(1000000))
+	ProfileID := *input.FirstName + strconv.Itoa(rand.Int())
 
 	profiles := &model.ProfileQl{
 		ID:          ProfileID,
@@ -27,13 +26,16 @@ func (r *mutationResolver) CreateProfile(ctx context.Context, input model.NewPro
 		Skills:      []*model.Skill{},
 		Description: *input.Description,
 	}
-	profileRepo.Save(profiles)
+	handlers.Repo.InsertProfilesQL(profiles)
 	return profiles, nil
 }
 
 func (r *queryResolver) Profile(ctx context.Context) ([]*model.ProfileQl, error) {
-	profiles := profileRepo.FindAll()
-
+	profiles, err := handlers.Repo.FindAll()
+	if err != nil {
+		return profiles, err
+	}
+	fmt.Println(profiles)
 	return profiles, nil
 }
 

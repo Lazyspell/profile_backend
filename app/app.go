@@ -5,16 +5,22 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/lazyspell/profile_backend/config"
 	"github.com/lazyspell/profile_backend/driver"
+	"github.com/lazyspell/profile_backend/graph"
+	"github.com/lazyspell/profile_backend/graph/generated"
 	"github.com/lazyspell/profile_backend/handlers"
 	"github.com/lazyspell/profile_backend/helpers"
-	r "github.com/lazyspell/profile_backend/routes"
 )
 
 const portNumber = ":8080"
+
+const defaultPort = "8080"
 
 var app config.AppConfig
 
@@ -28,16 +34,28 @@ func Start() {
 	}
 	defer client.NoSql.Disconnect(ctx)
 
-	fmt.Println("Connected to MongoDB!")
-
-	fmt.Println(fmt.Sprintf("Starting application on http://localhost:8080"))
-
-	srv := &http.Server{
-		Addr:    portNumber,
-		Handler: r.Routes(&app),
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = defaultPort
 	}
-	err = srv.ListenAndServe()
-	log.Fatal(err)
+
+	fmt.Println("Connected to MongoDB!")
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+
+	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	http.Handle("/query", srv)
+
+	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
+
+	// fmt.Println(fmt.Sprintf("Starting application on http://localhost:8080"))
+
+	// srv := &http.Server{
+	// 	Addr:    portNumber,
+	// 	Handler: r.Routes(&app),
+	// }
+	// err = srv.ListenAndServe()
+	// log.Fatal(err)
 
 }
 
