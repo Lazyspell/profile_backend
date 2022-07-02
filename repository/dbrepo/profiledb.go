@@ -47,7 +47,7 @@ func (m *mongoDBRepo) AllProfilesQL() ([]*model.ProfileQl, error) {
 
 	var results []*model.ProfileQl
 
-	coll := m.DB.Database("profiletest").Collection("profile")
+	coll := m.DB.Database("profiletest").Collection("profiletest")
 
 	cursor, err := coll.Find(context.TODO(), bson.D{})
 	if err != nil {
@@ -60,5 +60,19 @@ func (m *mongoDBRepo) AllProfilesQL() ([]*model.ProfileQl, error) {
 	}
 
 	return results, nil
+
+}
+
+func (m *mongoDBRepo) InsertProfilesQL(profile model.ProfileQl) (string, error) {
+
+	coll := m.DB.Database("profiletest").Collection("profiletest")
+
+	_, err := coll.InsertOne(context.TODO(), profile)
+	if err != nil {
+		log.Println(err)
+		return "failed", err
+	}
+
+	return "success", nil
 
 }
