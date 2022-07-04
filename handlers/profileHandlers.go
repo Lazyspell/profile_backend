@@ -55,3 +55,14 @@ func (m *Repository) InsertProfilesQL(newProfile *model.ProfileQl) {
 	}
 
 }
+
+func (m *Repository) GetProfileByIdQL(profileId string) (model.ProfileQl, error) {
+
+	results, err := m.DB.FindProfileById(profileId)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return results, err
+
+}
