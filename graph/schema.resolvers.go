@@ -6,6 +6,7 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 	"math/rand"
 	"strconv"
 
@@ -15,7 +16,6 @@ import (
 )
 
 func (r *mutationResolver) CreateProfile(ctx context.Context, input model.NewProfile) (*model.ProfileQl, error) {
-
 	ProfileID := *input.FirstName + strconv.Itoa(rand.Int())
 
 	profiles := &model.ProfileQl{
@@ -28,6 +28,15 @@ func (r *mutationResolver) CreateProfile(ctx context.Context, input model.NewPro
 	}
 	handlers.Repo.InsertProfilesQL(profiles)
 	return profiles, nil
+}
+
+func (r *queryResolver) ProfileID(ctx context.Context, id string) (*model.ProfileQl, error) {
+	profile, err := handlers.Repo.GetProfileByIdQL(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &profile, err
 }
 
 func (r *queryResolver) Profile(ctx context.Context) ([]*model.ProfileQl, error) {
