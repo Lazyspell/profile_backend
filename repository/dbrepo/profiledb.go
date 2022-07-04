@@ -76,3 +76,14 @@ func (m *mongoDBRepo) InsertProfilesQL(profile model.ProfileQl) (string, error) 
 	return "success", nil
 
 }
+
+func (m *mongoDBRepo) FindProfileById(profileId string) (model.ProfileQl, error) {
+	profileResults := model.ProfileQl{}
+	client := m.DB.Database("profiletest").Collection("profiletest")
+
+	cursor := client.FindOne(context.TODO(), bson.M{"id": profileId})
+
+	cursor.Decode(&profileResults)
+
+	return profileResults, nil
+}
