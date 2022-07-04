@@ -39,6 +39,7 @@ input NewProfile {
 }
 
 type Query {
+    profileId(id: ID!): ProfileQL!
     profile: [ProfileQL!]!
 }
 
