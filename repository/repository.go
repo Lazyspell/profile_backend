@@ -13,4 +13,5 @@ type DatabaseRepo interface {
 	//profiles Graphql
 	AllProfilesQL() ([]*model.ProfileQl, error)
 	InsertProfilesQL(profile model.ProfileQl) (string, error)
+	FindProfileById(profileId string) (model.ProfileQl, error)
 }
