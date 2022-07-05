@@ -16,6 +16,7 @@ import (
 	"github.com/lazyspell/profile_backend/graph/generated"
 	"github.com/lazyspell/profile_backend/handlers"
 	"github.com/lazyspell/profile_backend/helpers"
+	"github.com/lazyspell/profile_backend/middleware"
 )
 
 const portNumber = ":8080"
@@ -40,14 +41,17 @@ func Start() {
 	}
 
 	fmt.Println("Connected to MongoDB!")
+
+	//GraphQL Start
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	http.Handle("/query", middleware.Cors(srv))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 
+	//Rest API Start
 	// fmt.Println(fmt.Sprintf("Starting application on http://localhost:8080"))
 
 	// srv := &http.Server{
