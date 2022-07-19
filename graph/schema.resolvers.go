@@ -11,6 +11,7 @@ import (
 
 	"github.com/lazyspell/profile_backend/graph/generated"
 	"github.com/lazyspell/profile_backend/graph/model"
+	"github.com/lazyspell/profile_backend/helpers"
 )
 
 func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputProfile) (*model.ProfileQl, error) {
@@ -21,16 +22,17 @@ func (r *mutationResolver) SendEmail(ctx context.Context, input model.InputExter
 	host := "smtp.mail.yahoo.com"
 	port := "587"
 
+	toList := []string{os.Getenv("RECEIVING_EMAIL_ADDRESS")}
+
 	emailAddress := input.EmailAddress
-	toList := []string{emailAddress}
-	// emailName := input.Name
+	if !helpers.ValidMailAddress(emailAddress) {
+		return "Failed", nil
+	}
+
 	emailSubject := "Subject: " + input.EmailSubject + "\n"
 	emailMessage := "\n" + input.EmailName + "\n" + emailAddress + "\n" + input.EmailMessage
 	fromEmail := os.Getenv("YAHOO_EMAIL_ADDRESS")
 	passwordEmail := os.Getenv("YAHOO_PASSWORD")
-
-	// from := "jeremy2975@yahoo.com"
-	// password := "frrthgtadmasjcof"
 
 	message := []byte(emailSubject + emailMessage)
 
