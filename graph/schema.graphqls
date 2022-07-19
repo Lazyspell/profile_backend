@@ -3,17 +3,14 @@
 # https://gqlgen.com/getting-started/
 
 type ProfileQL {
-    id: ID!
-    name: Name!
-    location: Location!
-    email: String!
-    skills: [Skill]
-    description: String!
-}
-
-type Name {
     first_name: String!
     last_name: String!
+    dob: DateOfBirth!
+    location: Location!
+    skills: [Technologies]
+    projects: [Application]
+    contact: ContactInfo!
+    experience: [Job]
 }
 
 type Location {
@@ -22,27 +19,122 @@ type Location {
     zip_code: Int!
 }
 
-type Skill {
-    id: ID!
-    name: String!
-    Description: String!
+type DateOfBirth {
+    day: Int!
+    month: String!
+    year: Int!
+    age: Int!
 }
 
-input NewProfile {
+type Application {
+    project_name: String!
+    frontend_link: String!
+    frontend_description: String!
+    backend_link: String!
+    backend_description: String!
+}
+
+type ExternalEmail {
+    email_name: String!
+    email_address: String!
+    email_subject: String!
+    email_message: String!
+}
+
+type ContactInfo {
+    phone_number: String!
+    email: String!
+    github: String!
+    linkedin: String!
+    discord: String!
+    about_me: String!
+    about_my_career: String!
+}
+
+type Technologies {
+    tech_name: String!
+    tech_link: String!
+    years_of_experience: Int!
+    tech_description: String!
+}
+
+type Job {
+    company_name: String!
+    work_description: String!
+    years_worked: Int!
+}
+
+# _____________________________________INPUT AREA_____________________________________
+
+input InputProfile {
     first_name: String
     last_name: String
-    state: String
-    city: String
-    zip_code: Int
-    email: String
-    description: String
+    location: InputLocation
+    skills: [InputTechnologies]
+    dob: InputDateOfBirth
+    projects: [InputApplication]
+    contact: InputContactInfo
+    experience: [InputJob]
 }
 
+input InputContactInfo {
+    phone_number: String!
+    email: String!
+    github: String!
+    linkedin: String!
+    discord: String!
+    about_me: String!
+    about_my_career: String!
+}
+input InputExternalEmail {
+    email_name: String!
+    email_address: String!
+    email_subject: String!
+    email_message: String!
+}
+
+input InputTechnologies {
+    tech_name: String!
+    tech_link: String!
+    years_of_experience: Int!
+    tech_description: String!
+}
+
+input InputApplication {
+    project_name: String!
+    frontend_link: String!
+    frontend_description: String!
+    backend_link: String!
+    backend_description: String!
+}
+
+input InputJob {
+    company_name: String!
+    work_description: String!
+    years_worked: Int!
+}
+
+input InputDateOfBirth {
+    day: Int!
+    month: String!
+    year: Int!
+    age: Int!
+}
+
+input InputLocation {
+    state: String!
+    city: String!
+    zip_code: Int!
+}
+
+# _____________________________________QUERY AND MUTATION_____________________________________
+
 type Query {
-    profileId(id: ID!): ProfileQL!
+    profileId(email: String!): ProfileQL!
     profile: [ProfileQL!]!
 }
 
 type Mutation {
-    createProfile(input: NewProfile!): ProfileQL!
+    createProfile(input: InputProfile!): ProfileQL!
+    sendEmail(input: InputExternalEmail!): String!
 }
