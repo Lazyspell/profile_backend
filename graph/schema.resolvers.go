@@ -6,46 +6,28 @@ package graph
 import (
 	"context"
 	"fmt"
-	"log"
-	"math/rand"
-	"strconv"
 
 	"github.com/lazyspell/profile_backend/graph/generated"
 	"github.com/lazyspell/profile_backend/graph/model"
-	"github.com/lazyspell/profile_backend/handlers"
 )
 
-func (r *mutationResolver) CreateProfile(ctx context.Context, input model.NewProfile) (*model.ProfileQl, error) {
-	ProfileID := *input.FirstName + strconv.Itoa(rand.Int())
-
-	profiles := &model.ProfileQl{
-		ID:          ProfileID,
-		Name:        &model.Name{FirstName: *input.FirstName, LastName: *input.LastName},
-		Location:    &model.Location{State: *input.State, City: *input.City, ZipCode: *input.ZipCode},
-		Email:       *input.Email,
-		Skills:      []*model.Skill{},
-		Description: *input.Description,
-	}
-	handlers.Repo.InsertProfilesQL(profiles)
-	return profiles, nil
+func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputProfile) (*model.ProfileQl, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) ProfileID(ctx context.Context, id string) (*model.ProfileQl, error) {
-	profile, err := handlers.Repo.GetProfileByIdQL(id)
-	if err != nil {
-		log.Fatal(err)
-	}
+func (r *mutationResolver) SendEmail(ctx context.Context, input model.InputExternalEmail) (string, error) {
+	emailAddress := input.EmailAddress
+	emailName := input.Name
+	emailSubject := input.EmailSubject
+	emailMessage := input.EmailMessage
+}
 
-	return &profile, err
+func (r *queryResolver) ProfileID(ctx context.Context, email string) (*model.ProfileQl, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) Profile(ctx context.Context) ([]*model.ProfileQl, error) {
-	profiles, err := handlers.Repo.GetAllProfilesQL()
-	if err != nil {
-		return profiles, err
-	}
-	fmt.Println(profiles)
-	return profiles, nil
+	panic(fmt.Errorf("not implemented"))
 }
 
 // Mutation returns generated.MutationResolver implementation.
