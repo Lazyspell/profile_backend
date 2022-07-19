@@ -6,6 +6,8 @@ package graph
 import (
 	"context"
 	"fmt"
+	"net/smtp"
+	"os"
 
 	"github.com/lazyspell/profile_backend/graph/generated"
 	"github.com/lazyspell/profile_backend/graph/model"
@@ -16,10 +18,32 @@ func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputP
 }
 
 func (r *mutationResolver) SendEmail(ctx context.Context, input model.InputExternalEmail) (string, error) {
+	host := "smtp.mail.yahoo.com"
+	port := "587"
+
 	emailAddress := input.EmailAddress
-	emailName := input.Name
-	emailSubject := input.EmailSubject
-	emailMessage := input.EmailMessage
+	toList := []string{emailAddress}
+	// emailName := input.Name
+	emailSubject := "Subject: " + input.EmailSubject + "\n"
+	emailMessage := "\n" + input.EmailName + "\n" + emailAddress + "\n" + input.EmailMessage
+	fromEmail := os.Getenv("YAHOO_EMAIL_ADDRESS")
+	passwordEmail := os.Getenv("YAHOO_PASSWORD")
+
+	// from := "jeremy2975@yahoo.com"
+	// password := "frrthgtadmasjcof"
+
+	message := []byte(emailSubject + emailMessage)
+
+	auth := smtp.PlainAuth("", fromEmail, passwordEmail, host)
+	err := smtp.SendMail(host+":"+port, auth, fromEmail, toList, message)
+
+	if err != nil {
+		fmt.Print(err)
+		os.Exit(1)
+		return "Failed", err
+	}
+
+	return "Success", err
 }
 
 func (r *queryResolver) ProfileID(ctx context.Context, email string) (*model.ProfileQl, error) {
