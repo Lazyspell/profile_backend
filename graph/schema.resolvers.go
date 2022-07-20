@@ -70,7 +70,12 @@ func (r *queryResolver) ProfileID(ctx context.Context, email string) (*model.Pro
 }
 
 func (r *queryResolver) Profile(ctx context.Context) ([]*model.ProfileQl, error) {
-	panic(fmt.Errorf("not implemented"))
+	profiles, err := handlers.Repo.GetAllProfilesQL()
+	if err != nil {
+		return profiles, err
+	}
+	fmt.Println(profiles)
+	return profiles, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
