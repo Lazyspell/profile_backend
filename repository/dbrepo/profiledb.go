@@ -47,7 +47,7 @@ func (m *mongoDBRepo) AllProfilesQL() ([]*model.ProfileQl, error) {
 
 	var results []*model.ProfileQl
 
-	coll := m.DB.Database("profiletest").Collection("profiletest")
+	coll := m.DB.Database("profile_db").Collection("profile_collection")
 
 	cursor, err := coll.Find(context.TODO(), bson.D{})
 	if err != nil {
