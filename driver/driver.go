@@ -3,6 +3,7 @@ package driver
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -23,9 +24,9 @@ const maxDBLifeTime = 5 * time.Minute
 func ConnectMongoDB() (*DB, error) {
 	// Set client options
 
-	clientOptions := NewDatabase("mongodb://localhost:27017")
-	// connectionString := os.Getenv("DIGITAL_OCEAN_MONGO_DB")
-	// clientOptions := NewDatabase(connectionString)
+	// clientOptions := NewDatabase("mongodb://localhost:27017")
+	connectionString := os.Getenv("DIGITAL_OCEAN_MONGO_DB")
+	clientOptions := NewDatabase(connectionString)
 
 	clientOptions.SetMaxConnIdleTime(maxIdleDBCon)
 	clientOptions.SetMaxConnecting(uint64(maxDBLifeTime))
