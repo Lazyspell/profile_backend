@@ -62,6 +62,7 @@ type Job {
     company_name: String!
     work_description: String!
     years_worked: Int!
+    tech_used: [String!]!
 }
 
 # _____________________________________INPUT AREA_____________________________________
@@ -112,6 +113,7 @@ input InputJob {
     company_name: String!
     work_description: String!
     years_worked: Int!
+    tech_used: [String!]!
 }
 
 input InputDateOfBirth {
@@ -138,3 +140,4 @@ type Mutation {
     createProfile(input: InputProfile!): ProfileQL!
     sendEmail(input: InputExternalEmail!): String!
 }
+f

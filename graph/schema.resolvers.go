@@ -6,16 +6,33 @@ package graph
 import (
 	"context"
 	"fmt"
+	"log"
 	"net/smtp"
 	"os"
 
 	"github.com/lazyspell/profile_backend/graph/generated"
 	"github.com/lazyspell/profile_backend/graph/model"
+	"github.com/lazyspell/profile_backend/handlers"
 	"github.com/lazyspell/profile_backend/helpers"
 )
 
 func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputProfile) (*model.ProfileQl, error) {
-	panic(fmt.Errorf("not implemented"))
+
+	fmt.Println(input.Skills)
+
+	newProfile := &model.ProfileQl{
+		FirstName: *input.FirstName,
+		LastName:  *input.LastName,
+		Dob:       (*model.DateOfBirth)(input.Dob),
+		Location:  (*model.Location)(input.Location),
+		Contact:   (*model.ContactInfo)(input.Contact),
+	}
+
+	err := handlers.Repo.InsertProfilesQL(newProfile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return newProfile, nil
 }
 
 func (r *mutationResolver) SendEmail(ctx context.Context, input model.InputExternalEmail) (string, error) {

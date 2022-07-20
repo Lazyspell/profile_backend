@@ -48,11 +48,13 @@ func (m *Repository) GetAllProfilesQL() ([]*model.ProfileQl, error) {
 	return results, nil
 }
 
-func (m *Repository) InsertProfilesQL(newProfile *model.ProfileQl) {
+func (m *Repository) InsertProfilesQL(newProfile *model.ProfileQl) error {
 	_, err := m.DB.InsertProfilesQL(*newProfile)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+
+	return nil
 
 }
 
