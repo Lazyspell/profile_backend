@@ -78,6 +78,7 @@ type ComplexityRoot struct {
 
 	Job struct {
 		CompanyName     func(childComplexity int) int
+		TechUsed        func(childComplexity int) int
 		WorkDescription func(childComplexity int) int
 		YearsWorked     func(childComplexity int) int
 	}
@@ -287,6 +288,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Job.CompanyName(childComplexity), true
+
+	case "Job.tech_used":
+		if e.complexity.Job.TechUsed == nil {
+			break
+		}
+
+		return e.complexity.Job.TechUsed(childComplexity), true
 
 	case "Job.work_description":
 		if e.complexity.Job.WorkDescription == nil {
@@ -590,6 +598,7 @@ type Job {
     company_name: String!
     work_description: String!
     years_worked: Int!
+    tech_used: [String!]!
 }
 
 # _____________________________________INPUT AREA_____________________________________
@@ -640,6 +649,7 @@ input InputJob {
     company_name: String!
     work_description: String!
     years_worked: Int!
+    tech_used: [String!]!
 }
 
 input InputDateOfBirth {
@@ -1784,6 +1794,50 @@ func (ec *executionContext) fieldContext_Job_years_worked(ctx context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Job_tech_used(ctx context.Context, field graphql.CollectedField, obj *model.Job) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Job_tech_used(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TechUsed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Job_tech_used(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Job",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Location_state(ctx context.Context, field graphql.CollectedField, obj *model.Location) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Location_state(ctx, field)
 	if err != nil {
@@ -2444,6 +2498,8 @@ func (ec *executionContext) fieldContext_ProfileQL_experience(ctx context.Contex
 				return ec.fieldContext_Job_work_description(ctx, field)
 			case "years_worked":
 				return ec.fieldContext_Job_years_worked(ctx, field)
+			case "tech_used":
+				return ec.fieldContext_Job_tech_used(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Job", field.Name)
 		},
@@ -4917,6 +4973,14 @@ func (ec *executionContext) unmarshalInputInputJob(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
+		case "tech_used":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tech_used"))
+			it.TechUsed, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -5347,6 +5411,13 @@ func (ec *executionContext) _Job(ctx context.Context, sel ast.SelectionSet, obj 
 		case "years_worked":
 
 			out.Values[i] = ec._Job_years_worked(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tech_used":
+
+			out.Values[i] = ec._Job_tech_used(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
@@ -6116,6 +6187,38 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNString2ᚕstringᚄ(ctx context.Context, v interface{}) ([]string, error) {
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]string, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNString2string(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalNString2ᚕstringᚄ(ctx context.Context, sel ast.SelectionSet, v []string) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	for i := range v {
+		ret[i] = ec.marshalNString2string(ctx, sel, v[i])
+	}
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

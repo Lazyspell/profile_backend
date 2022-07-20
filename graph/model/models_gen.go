@@ -23,7 +23,7 @@ type ContactInfo struct {
 type DateOfBirth struct {
 	Day   int    `json:"day" bson:"day"`
 	Month string `json:"month" bson:"month"`
-	Year  int    `json:"year" bson:"month"`
+	Year  int    `json:"year" bson:"year"`
 	Age   int    `json:"age" bson:"age"`
 }
 
@@ -70,6 +70,7 @@ type InputJob struct {
 	CompanyName     string `json:"company_name" bson:"company_name"`
 	WorkDescription string `json:"work_description" bson:"work_description"`
 	YearsWorked     int    `json:"years_worked" bson:"years_worked"`
+	TechUsed 		[]string `json:"tech_used" bson:"tech_used"`
 }
 
 type InputLocation struct {
@@ -100,18 +101,19 @@ type Job struct {
 	CompanyName     string `json:"company_name" bson:"company_name"`
 	WorkDescription string `json:"work_description" bson:"work_description"`
 	YearsWorked     int    `json:"years_worked" bson:"years_worked"`
+	TechUsed 		[]string `json:"tech_used" bson:"tech_used"`
 }
 
 type Location struct {
 	State   string `json:"state" bson:"state"`
-	City    string `json:"city" bson:"state"`
+	City    string `json:"city" bson:"city"`
 	ZipCode int    `json:"zip_code" bson:"zip_code"`
 }
 
 type ProfileQl struct {
 	FirstName  string          `json:"first_name" bson:"first_name"`
 	LastName   string          `json:"last_name" bson:"last_name"`
-	Dob        *DateOfBirth    `json:"dob" bson:"dob"`
+	Dob        *DateOfBirth    `json:"data" bson:"dob"`
 	Location   *Location       `json:"location" bson:"location"`
 	Skills     []*Technologies `json:"skills" bson:"skills"`
 	Projects   []*Application  `json:"projects" bson:"projects"`
