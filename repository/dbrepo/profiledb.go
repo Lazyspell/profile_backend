@@ -65,7 +65,7 @@ func (m *mongoDBRepo) AllProfilesQL() ([]*model.ProfileQl, error) {
 
 func (m *mongoDBRepo) InsertProfilesQL(profile model.ProfileQl) (string, error) {
 
-	coll := m.DB.Database("profiletest").Collection("profiletest")
+	coll := m.DB.Database("profile_db").Collection("profile_collection")
 
 	_, err := coll.InsertOne(context.TODO(), profile)
 	if err != nil {
