@@ -47,7 +47,7 @@ func (m *mongoDBRepo) AllProfilesQL() ([]*model.ProfileQl, error) {
 
 	var results []*model.ProfileQl
 
-	coll := m.DB.Database("profiletest").Collection("profiletest")
+	coll := m.DB.Database("profile_db").Collection("profile_collection")
 
 	cursor, err := coll.Find(context.TODO(), bson.D{})
 	if err != nil {
@@ -79,9 +79,9 @@ func (m *mongoDBRepo) InsertProfilesQL(profile model.ProfileQl) (string, error) 
 
 func (m *mongoDBRepo) FindProfileById(profileId string) (model.ProfileQl, error) {
 	profileResults := model.ProfileQl{}
-	client := m.DB.Database("profiletest").Collection("profiletest")
+	call := m.DB.Database("profile_db").Collection("profile_collection")
 
-	cursor := client.FindOne(context.TODO(), bson.M{"id": profileId})
+	cursor := call.FindOne(context.TODO(), bson.M{"contact.email": profileId})
 
 	cursor.Decode(&profileResults)
 

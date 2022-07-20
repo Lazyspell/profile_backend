@@ -66,11 +66,21 @@ func (r *mutationResolver) SendEmail(ctx context.Context, input model.InputExter
 }
 
 func (r *queryResolver) ProfileID(ctx context.Context, email string) (*model.ProfileQl, error) {
-	panic(fmt.Errorf("not implemented"))
+	profile, err := handlers.Repo.GetProfileByIdQL(email)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &profile, err
 }
 
 func (r *queryResolver) Profile(ctx context.Context) ([]*model.ProfileQl, error) {
-	panic(fmt.Errorf("not implemented"))
+	profiles, err := handlers.Repo.GetAllProfilesQL()
+	if err != nil {
+		return profiles, err
+	}
+	fmt.Println(profiles)
+	return profiles, nil
 }
 
 // Mutation returns generated.MutationResolver implementation.
