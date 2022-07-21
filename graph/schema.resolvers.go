@@ -83,11 +83,35 @@ func (r *mutationResolver) UpdateSkills(ctx context.Context, input model.InputTe
 }
 
 func (r *mutationResolver) UpdateProjects(ctx context.Context, input model.InputApplication) (*model.ProfileQl, error) {
-	panic(fmt.Errorf("not implemented"))
+
+	inputProjects := &model.Application{
+		ProjectName:         input.ProjectName,
+		FrontendLink:        input.FrontendLink,
+		FrontendDescription: input.FrontendDescription,
+		BackendLink:         input.BackendLink,
+		BackendDescription:  input.BackendDescription,
+	}
+
+	results, err := handlers.Repo.UpdateProjects(*inputProjects)
+	if err != nil {
+		return &results, err
+	}
+	return &results, err
 }
 
 func (r *mutationResolver) UpdateJob(ctx context.Context, input model.InputJob) (*model.ProfileQl, error) {
-	panic(fmt.Errorf("not implemented"))
+	inputJobs := &model.Job{
+		CompanyName:     input.CompanyName,
+		WorkDescription: input.WorkDescription,
+		YearsWorked:     input.YearsWorked,
+		TechUsed:        input.TechUsed,
+	}
+
+	results, err := handlers.Repo.UpdateJob(*inputJobs)
+	if err != nil {
+		return &results, err
+	}
+	return &results, err
 }
 
 func (r *queryResolver) ProfileID(ctx context.Context, email string) (*model.ProfileQl, error) {
