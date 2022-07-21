@@ -2,6 +2,7 @@ package dbrepo
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/lazyspell/profile_backend/graph/model"
@@ -86,4 +87,19 @@ func (m *mongoDBRepo) FindProfileById(profileId string) (model.ProfileQl, error)
 	cursor.Decode(&profileResults)
 
 	return profileResults, nil
+}
+
+func (m *mongoDBRepo) UpdateSkillsQL(technologies model.Technologies) error {
+	call := m.DB.Database("profile_db").Collection("profile_collection")
+
+	query := bson.M{"contact.email": "jelam2975@gmail.com"}
+	update := bson.M{"$push": bson.M{"skills": technologies}}
+
+	_, err := call.UpdateOne(context.TODO(), query, update)
+	if err != nil {
+		fmt.Println("failed")
+		fmt.Println(err)
+		return err
+	}
+	return nil
 }
