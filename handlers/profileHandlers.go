@@ -68,3 +68,51 @@ func (m *Repository) GetProfileByIdQL(profileId string) (model.ProfileQl, error)
 	return results, err
 
 }
+
+func (m *Repository) UpdateSkills(technology model.Technologies) (model.ProfileQl, error) {
+
+	err := m.DB.UpdateSkillsQL(technology)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	results, err := m.DB.FindProfileById("jelam2975@gmail.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return results, err
+
+}
+
+func (m *Repository) UpdateProjects(application model.Application) (model.ProfileQl, error) {
+
+	err := m.DB.UpdateProjectsQL(application)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	results, err := m.DB.FindProfileById("jelam2975@gmail.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return results, err
+
+}
+
+func (m *Repository) UpdateJob(job model.Job) (model.ProfileQl, error) {
+
+	err := m.DB.UpdateJobQL(job)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	results, err := m.DB.FindProfileById("jelam2975@gmail.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return results, err
+
+}

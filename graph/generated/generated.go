@@ -90,8 +90,11 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateProfile func(childComplexity int, input model.InputProfile) int
-		SendEmail     func(childComplexity int, input model.InputExternalEmail) int
+		CreateProfile  func(childComplexity int, input model.InputProfile) int
+		SendEmail      func(childComplexity int, input model.InputExternalEmail) int
+		UpdateJob      func(childComplexity int, input model.InputJob) int
+		UpdateProjects func(childComplexity int, input model.InputApplication) int
+		UpdateSkills   func(childComplexity int, input model.InputTechnologies) int
 	}
 
 	ProfileQL struct {
@@ -121,6 +124,9 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateProfile(ctx context.Context, input model.InputProfile) (*model.ProfileQl, error)
 	SendEmail(ctx context.Context, input model.InputExternalEmail) (string, error)
+	UpdateSkills(ctx context.Context, input model.InputTechnologies) (*model.ProfileQl, error)
+	UpdateProjects(ctx context.Context, input model.InputApplication) (*model.ProfileQl, error)
+	UpdateJob(ctx context.Context, input model.InputJob) (*model.ProfileQl, error)
 }
 type QueryResolver interface {
 	ProfileID(ctx context.Context, email string) (*model.ProfileQl, error)
@@ -354,6 +360,42 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Mutation.SendEmail(childComplexity, args["input"].(model.InputExternalEmail)), true
+
+	case "Mutation.updateJob":
+		if e.complexity.Mutation.UpdateJob == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateJob_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateJob(childComplexity, args["input"].(model.InputJob)), true
+
+	case "Mutation.updateProjects":
+		if e.complexity.Mutation.UpdateProjects == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateProjects_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateProjects(childComplexity, args["input"].(model.InputApplication)), true
+
+	case "Mutation.updateSkills":
+		if e.complexity.Mutation.UpdateSkills == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateSkills_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateSkills(childComplexity, args["input"].(model.InputTechnologies)), true
 
 	case "ProfileQL.contact":
 		if e.complexity.ProfileQL.Contact == nil {
@@ -675,6 +717,9 @@ type Query {
 type Mutation {
     createProfile(input: InputProfile!): ProfileQL!
     sendEmail(input: InputExternalEmail!): String!
+    updateSkills(input: InputTechnologies!): ProfileQL!
+    updateProjects(input: InputApplication!): ProfileQL!
+    updateJob(input: InputJob!): ProfileQL!
 }
 `, BuiltIn: false},
 }
@@ -706,6 +751,51 @@ func (ec *executionContext) field_Mutation_sendEmail_args(ctx context.Context, r
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNInputExternalEmail2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputExternalEmail(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateJob_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.InputJob
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNInputJob2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputJob(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateProjects_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.InputApplication
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNInputApplication2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputApplication(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateSkills_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.InputTechnologies
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNInputTechnologies2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputTechnologies(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2092,6 +2182,225 @@ func (ec *executionContext) fieldContext_Mutation_sendEmail(ctx context.Context,
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_sendEmail_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateSkills(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateSkills(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateSkills(rctx, fc.Args["input"].(model.InputTechnologies))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProfileQl)
+	fc.Result = res
+	return ec.marshalNProfileQL2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfileQl(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateSkills(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "first_name":
+				return ec.fieldContext_ProfileQL_first_name(ctx, field)
+			case "last_name":
+				return ec.fieldContext_ProfileQL_last_name(ctx, field)
+			case "dob":
+				return ec.fieldContext_ProfileQL_dob(ctx, field)
+			case "location":
+				return ec.fieldContext_ProfileQL_location(ctx, field)
+			case "skills":
+				return ec.fieldContext_ProfileQL_skills(ctx, field)
+			case "projects":
+				return ec.fieldContext_ProfileQL_projects(ctx, field)
+			case "contact":
+				return ec.fieldContext_ProfileQL_contact(ctx, field)
+			case "experience":
+				return ec.fieldContext_ProfileQL_experience(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProfileQL", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateSkills_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateProjects(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateProjects(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateProjects(rctx, fc.Args["input"].(model.InputApplication))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProfileQl)
+	fc.Result = res
+	return ec.marshalNProfileQL2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfileQl(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateProjects(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "first_name":
+				return ec.fieldContext_ProfileQL_first_name(ctx, field)
+			case "last_name":
+				return ec.fieldContext_ProfileQL_last_name(ctx, field)
+			case "dob":
+				return ec.fieldContext_ProfileQL_dob(ctx, field)
+			case "location":
+				return ec.fieldContext_ProfileQL_location(ctx, field)
+			case "skills":
+				return ec.fieldContext_ProfileQL_skills(ctx, field)
+			case "projects":
+				return ec.fieldContext_ProfileQL_projects(ctx, field)
+			case "contact":
+				return ec.fieldContext_ProfileQL_contact(ctx, field)
+			case "experience":
+				return ec.fieldContext_ProfileQL_experience(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProfileQL", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateProjects_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateJob(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateJob(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateJob(rctx, fc.Args["input"].(model.InputJob))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProfileQl)
+	fc.Result = res
+	return ec.marshalNProfileQL2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfileQl(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateJob(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "first_name":
+				return ec.fieldContext_ProfileQL_first_name(ctx, field)
+			case "last_name":
+				return ec.fieldContext_ProfileQL_last_name(ctx, field)
+			case "dob":
+				return ec.fieldContext_ProfileQL_dob(ctx, field)
+			case "location":
+				return ec.fieldContext_ProfileQL_location(ctx, field)
+			case "skills":
+				return ec.fieldContext_ProfileQL_skills(ctx, field)
+			case "projects":
+				return ec.fieldContext_ProfileQL_projects(ctx, field)
+			case "contact":
+				return ec.fieldContext_ProfileQL_contact(ctx, field)
+			case "experience":
+				return ec.fieldContext_ProfileQL_experience(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProfileQL", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateJob_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -5512,6 +5821,33 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updateSkills":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateSkills(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateProjects":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateProjects(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "updateJob":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateJob(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6081,13 +6417,28 @@ func (ec *executionContext) marshalNDateOfBirth2ᚖgithubᚗcomᚋlazyspellᚋpr
 	return ec._DateOfBirth(ctx, sel, v)
 }
 
+func (ec *executionContext) unmarshalNInputApplication2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputApplication(ctx context.Context, v interface{}) (model.InputApplication, error) {
+	res, err := ec.unmarshalInputInputApplication(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNInputExternalEmail2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputExternalEmail(ctx context.Context, v interface{}) (model.InputExternalEmail, error) {
 	res, err := ec.unmarshalInputInputExternalEmail(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNInputJob2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputJob(ctx context.Context, v interface{}) (model.InputJob, error) {
+	res, err := ec.unmarshalInputInputJob(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNInputProfile2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputProfile(ctx context.Context, v interface{}) (model.InputProfile, error) {
 	res, err := ec.unmarshalInputInputProfile(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNInputTechnologies2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputTechnologies(ctx context.Context, v interface{}) (model.InputTechnologies, error) {
+	res, err := ec.unmarshalInputInputTechnologies(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
