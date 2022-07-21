@@ -15,4 +15,6 @@ type DatabaseRepo interface {
 	InsertProfilesQL(profile model.ProfileQl) (string, error)
 	FindProfileById(profileId string) (model.ProfileQl, error)
 	UpdateSkillsQL(technologies model.Technologies) error
+	UpdateProjectsQL(application model.Application) error
+	UpdateJobQL(job model.Job) error
 }
