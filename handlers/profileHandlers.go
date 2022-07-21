@@ -68,3 +68,19 @@ func (m *Repository) GetProfileByIdQL(profileId string) (model.ProfileQl, error)
 	return results, err
 
 }
+
+func (m *Repository) UpdateSkills(technology model.Technologies) (model.ProfileQl, error) {
+
+	err := m.DB.UpdateSkillsQL(technology)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	results, err := m.DB.FindProfileById("jelam2975@gmail.com")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return results, err
+
+}
