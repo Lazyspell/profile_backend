@@ -69,30 +69,14 @@ func (m *Repository) GetProfileByIdQL(profileId string) (model.ProfileQl, error)
 
 }
 
-func (m *Repository) UpdateSkills(technology model.Technologies) (model.ProfileQl, error) {
+func (m *Repository) UpdateSkills(technology model.Technologies, email string) (model.ProfileQl, error) {
 
-	err := m.DB.UpdateSkillsQL(technology)
+	err := m.DB.UpdateSkillsQL(technology, email)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	results, err := m.DB.FindProfileById("jelam2975@gmail.com")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return results, err
-
-}
-
-func (m *Repository) UpdateProjects(application model.Application) (model.ProfileQl, error) {
-
-	err := m.DB.UpdateProjectsQL(application)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	results, err := m.DB.FindProfileById("jelam2975@gmail.com")
+	results, err := m.DB.FindProfileById(email)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -101,14 +85,30 @@ func (m *Repository) UpdateProjects(application model.Application) (model.Profil
 
 }
 
-func (m *Repository) UpdateJob(job model.Job) (model.ProfileQl, error) {
+func (m *Repository) UpdateProjects(application model.Application, email string) (model.ProfileQl, error) {
 
-	err := m.DB.UpdateJobQL(job)
+	err := m.DB.UpdateProjectsQL(application, email)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	results, err := m.DB.FindProfileById("jelam2975@gmail.com")
+	results, err := m.DB.FindProfileById(email)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return results, err
+
+}
+
+func (m *Repository) UpdateJob(job model.Job, email string) (model.ProfileQl, error) {
+
+	err := m.DB.UpdateJobQL(job, email)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	results, err := m.DB.FindProfileById(email)
 	if err != nil {
 		log.Fatal(err)
 	}

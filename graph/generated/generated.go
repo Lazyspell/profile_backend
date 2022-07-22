@@ -92,9 +92,9 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateProfile  func(childComplexity int, input model.InputProfile) int
 		SendEmail      func(childComplexity int, input model.InputExternalEmail) int
-		UpdateJob      func(childComplexity int, input model.InputJob) int
-		UpdateProjects func(childComplexity int, input model.InputApplication) int
-		UpdateSkills   func(childComplexity int, input model.InputTechnologies) int
+		UpdateJob      func(childComplexity int, input model.InputJob, email string) int
+		UpdateProjects func(childComplexity int, input model.InputApplication, email string) int
+		UpdateSkills   func(childComplexity int, input model.InputTechnologies, email string) int
 	}
 
 	ProfileQL struct {
@@ -124,9 +124,9 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateProfile(ctx context.Context, input model.InputProfile) (*model.ProfileQl, error)
 	SendEmail(ctx context.Context, input model.InputExternalEmail) (string, error)
-	UpdateSkills(ctx context.Context, input model.InputTechnologies) (*model.ProfileQl, error)
-	UpdateProjects(ctx context.Context, input model.InputApplication) (*model.ProfileQl, error)
-	UpdateJob(ctx context.Context, input model.InputJob) (*model.ProfileQl, error)
+	UpdateSkills(ctx context.Context, input model.InputTechnologies, email string) (*model.ProfileQl, error)
+	UpdateProjects(ctx context.Context, input model.InputApplication, email string) (*model.ProfileQl, error)
+	UpdateJob(ctx context.Context, input model.InputJob, email string) (*model.ProfileQl, error)
 }
 type QueryResolver interface {
 	ProfileID(ctx context.Context, email string) (*model.ProfileQl, error)
@@ -371,7 +371,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateJob(childComplexity, args["input"].(model.InputJob)), true
+		return e.complexity.Mutation.UpdateJob(childComplexity, args["input"].(model.InputJob), args["email"].(string)), true
 
 	case "Mutation.updateProjects":
 		if e.complexity.Mutation.UpdateProjects == nil {
@@ -383,7 +383,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateProjects(childComplexity, args["input"].(model.InputApplication)), true
+		return e.complexity.Mutation.UpdateProjects(childComplexity, args["input"].(model.InputApplication), args["email"].(string)), true
 
 	case "Mutation.updateSkills":
 		if e.complexity.Mutation.UpdateSkills == nil {
@@ -395,7 +395,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateSkills(childComplexity, args["input"].(model.InputTechnologies)), true
+		return e.complexity.Mutation.UpdateSkills(childComplexity, args["input"].(model.InputTechnologies), args["email"].(string)), true
 
 	case "ProfileQL.contact":
 		if e.complexity.ProfileQL.Contact == nil {
@@ -717,9 +717,9 @@ type Query {
 type Mutation {
     createProfile(input: InputProfile!): ProfileQL!
     sendEmail(input: InputExternalEmail!): String!
-    updateSkills(input: InputTechnologies!): ProfileQL!
-    updateProjects(input: InputApplication!): ProfileQL!
-    updateJob(input: InputJob!): ProfileQL!
+    updateSkills(input: InputTechnologies!, email: String!): ProfileQL!
+    updateProjects(input: InputApplication!, email: String!): ProfileQL!
+    updateJob(input: InputJob!, email: String!): ProfileQL!
 }
 `, BuiltIn: false},
 }
@@ -771,6 +771,15 @@ func (ec *executionContext) field_Mutation_updateJob_args(ctx context.Context, r
 		}
 	}
 	args["input"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["email"] = arg1
 	return args, nil
 }
 
@@ -786,6 +795,15 @@ func (ec *executionContext) field_Mutation_updateProjects_args(ctx context.Conte
 		}
 	}
 	args["input"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["email"] = arg1
 	return args, nil
 }
 
@@ -801,6 +819,15 @@ func (ec *executionContext) field_Mutation_updateSkills_args(ctx context.Context
 		}
 	}
 	args["input"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["email"] = arg1
 	return args, nil
 }
 
@@ -2202,7 +2229,7 @@ func (ec *executionContext) _Mutation_updateSkills(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateSkills(rctx, fc.Args["input"].(model.InputTechnologies))
+		return ec.resolvers.Mutation().UpdateSkills(rctx, fc.Args["input"].(model.InputTechnologies), fc.Args["email"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2275,7 +2302,7 @@ func (ec *executionContext) _Mutation_updateProjects(ctx context.Context, field 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateProjects(rctx, fc.Args["input"].(model.InputApplication))
+		return ec.resolvers.Mutation().UpdateProjects(rctx, fc.Args["input"].(model.InputApplication), fc.Args["email"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2348,7 +2375,7 @@ func (ec *executionContext) _Mutation_updateJob(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateJob(rctx, fc.Args["input"].(model.InputJob))
+		return ec.resolvers.Mutation().UpdateJob(rctx, fc.Args["input"].(model.InputJob), fc.Args["email"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

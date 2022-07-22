@@ -89,10 +89,10 @@ func (m *mongoDBRepo) FindProfileById(profileId string) (model.ProfileQl, error)
 	return profileResults, nil
 }
 
-func (m *mongoDBRepo) UpdateSkillsQL(technologies model.Technologies) error {
+func (m *mongoDBRepo) UpdateSkillsQL(technologies model.Technologies, email string) error {
 	call := m.DB.Database("profile_db").Collection("profile_collection")
 
-	query := bson.M{"contact.email": "jelam2975@gmail.com"}
+	query := bson.M{"contact.email": email}
 	update := bson.M{"$push": bson.M{"skills": technologies}}
 
 	_, err := call.UpdateOne(context.TODO(), query, update)
@@ -104,10 +104,10 @@ func (m *mongoDBRepo) UpdateSkillsQL(technologies model.Technologies) error {
 	return nil
 }
 
-func (m *mongoDBRepo) UpdateProjectsQL(application model.Application) error {
+func (m *mongoDBRepo) UpdateProjectsQL(application model.Application, email string) error {
 	call := m.DB.Database("profile_db").Collection("profile_collection")
 
-	query := bson.M{"contact.email": "jelam2975@gmail.com"}
+	query := bson.M{"contact.email": email}
 	update := bson.M{"$push": bson.M{"projects": application}}
 
 	_, err := call.UpdateOne(context.TODO(), query, update)
@@ -119,10 +119,10 @@ func (m *mongoDBRepo) UpdateProjectsQL(application model.Application) error {
 	return nil
 }
 
-func (m *mongoDBRepo) UpdateJobQL(job model.Job) error {
+func (m *mongoDBRepo) UpdateJobQL(job model.Job, email string) error {
 	call := m.DB.Database("profile_db").Collection("profile_collection")
 
-	query := bson.M{"contact.email": "jelam2975@gmail.com"}
+	query := bson.M{"contact.email": email}
 	update := bson.M{"$push": bson.M{"experience": job}}
 
 	_, err := call.UpdateOne(context.TODO(), query, update)

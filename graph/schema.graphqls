@@ -139,7 +139,7 @@ type Query {
 type Mutation {
     createProfile(input: InputProfile!): ProfileQL!
     sendEmail(input: InputExternalEmail!): String!
-    updateSkills(input: InputTechnologies!): ProfileQL!
-    updateProjects(input: InputApplication!): ProfileQL!
-    updateJob(input: InputJob!): ProfileQL!
+    updateSkills(input: InputTechnologies!, email: String!): ProfileQL!
+    updateProjects(input: InputApplication!, email: String!): ProfileQL!
+    updateJob(input: InputJob!, email: String!): ProfileQL!
 }

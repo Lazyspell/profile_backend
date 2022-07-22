@@ -17,7 +17,6 @@ import (
 )
 
 func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputProfile) (*model.ProfileQl, error) {
-
 	newProfile := &model.ProfileQl{
 		FirstName:  *input.FirstName,
 		LastName:   *input.LastName,
@@ -66,8 +65,7 @@ func (r *mutationResolver) SendEmail(ctx context.Context, input model.InputExter
 	return "Success", err
 }
 
-func (r *mutationResolver) UpdateSkills(ctx context.Context, input model.InputTechnologies) (*model.ProfileQl, error) {
-
+func (r *mutationResolver) UpdateSkills(ctx context.Context, input model.InputTechnologies, email string) (*model.ProfileQl, error) {
 	inputSkills := &model.Technologies{
 		TechName:          input.TechName,
 		TechLink:          input.TechLink,
@@ -75,15 +73,14 @@ func (r *mutationResolver) UpdateSkills(ctx context.Context, input model.InputTe
 		TechDescription:   input.TechDescription,
 	}
 
-	results, err := handlers.Repo.UpdateSkills(*inputSkills)
+	results, err := handlers.Repo.UpdateSkills(*inputSkills, email)
 	if err != nil {
 		return &results, err
 	}
 	return &results, err
 }
 
-func (r *mutationResolver) UpdateProjects(ctx context.Context, input model.InputApplication) (*model.ProfileQl, error) {
-
+func (r *mutationResolver) UpdateProjects(ctx context.Context, input model.InputApplication, email string) (*model.ProfileQl, error) {
 	inputProjects := &model.Application{
 		ProjectName:         input.ProjectName,
 		FrontendLink:        input.FrontendLink,
@@ -92,14 +89,14 @@ func (r *mutationResolver) UpdateProjects(ctx context.Context, input model.Input
 		BackendDescription:  input.BackendDescription,
 	}
 
-	results, err := handlers.Repo.UpdateProjects(*inputProjects)
+	results, err := handlers.Repo.UpdateProjects(*inputProjects, email)
 	if err != nil {
 		return &results, err
 	}
 	return &results, err
 }
 
-func (r *mutationResolver) UpdateJob(ctx context.Context, input model.InputJob) (*model.ProfileQl, error) {
+func (r *mutationResolver) UpdateJob(ctx context.Context, input model.InputJob, email string) (*model.ProfileQl, error) {
 	inputJobs := &model.Job{
 		CompanyName:     input.CompanyName,
 		WorkDescription: input.WorkDescription,
@@ -107,7 +104,7 @@ func (r *mutationResolver) UpdateJob(ctx context.Context, input model.InputJob) 
 		TechUsed:        input.TechUsed,
 	}
 
-	results, err := handlers.Repo.UpdateJob(*inputJobs)
+	results, err := handlers.Repo.UpdateJob(*inputJobs, email)
 	if err != nil {
 		return &results, err
 	}
