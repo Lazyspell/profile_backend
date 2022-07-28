@@ -69,6 +69,7 @@ func (r *mutationResolver) UpdateSkills(ctx context.Context, input model.InputTe
 	inputSkills := &model.Technologies{
 		TechName:          input.TechName,
 		TechLink:          input.TechLink,
+		ImageURL:          input.ImageLink,
 		YearsOfExperience: input.YearsOfExperience,
 		TechDescription:   input.TechDescription,
 	}
