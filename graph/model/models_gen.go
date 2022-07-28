@@ -55,27 +55,27 @@ type InputContactInfo struct {
 type InputDateOfBirth struct {
 	Day   int    `json:"day" bson:"day"`
 	Month string `json:"month" bson:"month"`
-	Year  int    `json:"year" bson:"month"`
+	Year  int    `json:"year" bson:"year"`
 	Age   int    `json:"age" bson:"age"`
 }
 
 type InputExternalEmail struct {
-	EmailName         string `json:"email_name" bson:"email_name"`
+	EmailName    string `json:"email_name" bson:"email_name"`
 	EmailAddress string `json:"email_address" bson:"email_address"`
 	EmailSubject string `json:"email_subject" bson:"email_subject"`
 	EmailMessage string `json:"email_message" bson:"email_message"`
 }
 
 type InputJob struct {
-	CompanyName     string `json:"company_name" bson:"company_name"`
-	WorkDescription string `json:"work_description" bson:"work_description"`
-	YearsWorked     int    `json:"years_worked" bson:"years_worked"`
-	TechUsed 		[]string `json:"tech_used" bson:"tech_used"`
+	CompanyName     string   `json:"company_name" bson:"company_name"`
+	WorkDescription string   `json:"work_description" bson:"work_description"`
+	YearsWorked     int      `json:"years_worked" bson:"years_worked"`
+	TechUsed        []string `json:"tech_used" bson:"tech_used"`
 }
 
 type InputLocation struct {
 	State   string `json:"state" bson:"state"`
-	City    string `json:"city" bson:"state"`
+	City    string `json:"city" bson:"city"`
 	ZipCode int    `json:"zip_code" bson:"zip_code"`
 }
 
@@ -93,15 +93,16 @@ type InputProfile struct {
 type InputTechnologies struct {
 	TechName          string `json:"tech_name" bson:"tech_name"`
 	TechLink          string `json:"tech_link" bson:"tech_link"`
-	YearsOfExperience int    `json:"year_of_experience" bson:"year_of_experience"`
+	ImageLink         string `json:"image_link" bson:"image_link"`
+	YearsOfExperience int    `json:"years_of_experience" bson:"years_of_experience"`
 	TechDescription   string `json:"tech_description" bson:"tech_description"`
 }
 
 type Job struct {
-	CompanyName     string `json:"company_name" bson:"company_name"`
-	WorkDescription string `json:"work_description" bson:"work_description"`
-	YearsWorked     int    `json:"years_worked" bson:"years_worked"`
-	TechUsed 		[]string `json:"tech_used" bson:"tech_used"`
+	CompanyName     string   `json:"company_name" bson:"company_name"`
+	WorkDescription string   `json:"work_description" bson:"work_description"`
+	YearsWorked     int      `json:"years_worked" bson:"years_worked"`
+	TechUsed        []string `json:"tech_used" bson:"tech_used"`
 }
 
 type Location struct {
@@ -113,7 +114,7 @@ type Location struct {
 type ProfileQl struct {
 	FirstName  string          `json:"first_name" bson:"first_name"`
 	LastName   string          `json:"last_name" bson:"last_name"`
-	Dob        *DateOfBirth    `json:"data" bson:"dob"`
+	Dob        *DateOfBirth    `json:"dob" bson:"dob"`
 	Location   *Location       `json:"location" bson:"location"`
 	Skills     []*Technologies `json:"skills" bson:"skills"`
 	Projects   []*Application  `json:"projects" bson:"projects"`
@@ -124,6 +125,7 @@ type ProfileQl struct {
 type Technologies struct {
 	TechName          string `json:"tech_name" bson:"tech_name"`
 	TechLink          string `json:"tech_link" bson:"tech_link"`
-	YearsOfExperience int    `json:"year_of_experience" bson:"year_of_experience"`
+	ImageURL          string `json:"image_url" bson:"image_url"`
+	YearsOfExperience int    `json:"years_of_experience" bson:"years_of_experience"`
 	TechDescription   string `json:"tech_description" bson:"tech_description"`
 }

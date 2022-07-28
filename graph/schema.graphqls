@@ -54,6 +54,7 @@ type ContactInfo {
 type Technologies {
     tech_name: String!
     tech_link: String!
+    image_url: String!
     years_of_experience: Int!
     tech_description: String!
 }
@@ -97,6 +98,7 @@ input InputExternalEmail {
 input InputTechnologies {
     tech_name: String!
     tech_link: String!
+    image_link: String!
     years_of_experience: Int!
     tech_description: String!
 }
