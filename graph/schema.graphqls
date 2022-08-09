@@ -7,7 +7,7 @@ type ProfileQL {
     last_name: String!
     dob: DateOfBirth!
     location: Location!
-    skills: [Technologies]
+    skills: Categories
     projects: [Application]
     contact: ContactInfo!
     experience: [Job]
@@ -51,6 +51,13 @@ type ContactInfo {
     about_my_career: String!
 }
 
+type Categories {
+    frontend: [Technologies]
+    backend: [Technologies]
+    machine_learning: [Technologies]
+    cloud_service: [Technologies]
+}
+
 type Technologies {
     tech_name: String!
     tech_link: String!
@@ -72,7 +79,7 @@ input InputProfile {
     first_name: String
     last_name: String
     location: InputLocation
-    skills: [InputTechnologies]
+    skills: InputCategories
     dob: InputDateOfBirth
     projects: [InputApplication]
     contact: InputContactInfo
@@ -93,6 +100,13 @@ input InputExternalEmail {
     email_address: String!
     email_subject: String!
     email_message: String!
+}
+
+input InputCategories {
+    frontend: [InputTechnologies]
+    backend: [InputTechnologies]
+    machine_learning: [InputTechnologies]
+    cloud_service: [InputTechnologies]
 }
 
 input InputTechnologies {
@@ -141,7 +155,11 @@ type Query {
 type Mutation {
     createProfile(input: InputProfile!): ProfileQL!
     sendEmail(input: InputExternalEmail!): String!
-    updateSkills(input: InputTechnologies!, email: String!): ProfileQL!
+    updateSkills(
+        input: InputTechnologies!
+        category: String!
+        email: String!
+    ): ProfileQL!
     updateProjects(input: InputApplication!, email: String!): ProfileQL!
     updateJob(input: InputJob!, email: String!): ProfileQL!
 }

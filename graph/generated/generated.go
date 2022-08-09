@@ -52,6 +52,13 @@ type ComplexityRoot struct {
 		ProjectName         func(childComplexity int) int
 	}
 
+	Categories struct {
+		Backend         func(childComplexity int) int
+		CloudService    func(childComplexity int) int
+		Frontend        func(childComplexity int) int
+		MachineLearning func(childComplexity int) int
+	}
+
 	ContactInfo struct {
 		AboutMe       func(childComplexity int) int
 		AboutMyCareer func(childComplexity int) int
@@ -94,7 +101,7 @@ type ComplexityRoot struct {
 		SendEmail      func(childComplexity int, input model.InputExternalEmail) int
 		UpdateJob      func(childComplexity int, input model.InputJob, email string) int
 		UpdateProjects func(childComplexity int, input model.InputApplication, email string) int
-		UpdateSkills   func(childComplexity int, input model.InputTechnologies, email string) int
+		UpdateSkills   func(childComplexity int, input model.InputTechnologies, category string, email string) int
 	}
 
 	ProfileQL struct {
@@ -125,7 +132,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	CreateProfile(ctx context.Context, input model.InputProfile) (*model.ProfileQl, error)
 	SendEmail(ctx context.Context, input model.InputExternalEmail) (string, error)
-	UpdateSkills(ctx context.Context, input model.InputTechnologies, email string) (*model.ProfileQl, error)
+	UpdateSkills(ctx context.Context, input model.InputTechnologies, category string, email string) (*model.ProfileQl, error)
 	UpdateProjects(ctx context.Context, input model.InputApplication, email string) (*model.ProfileQl, error)
 	UpdateJob(ctx context.Context, input model.InputJob, email string) (*model.ProfileQl, error)
 }
@@ -183,6 +190,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Application.ProjectName(childComplexity), true
+
+	case "Categories.backend":
+		if e.complexity.Categories.Backend == nil {
+			break
+		}
+
+		return e.complexity.Categories.Backend(childComplexity), true
+
+	case "Categories.cloud_service":
+		if e.complexity.Categories.CloudService == nil {
+			break
+		}
+
+		return e.complexity.Categories.CloudService(childComplexity), true
+
+	case "Categories.frontend":
+		if e.complexity.Categories.Frontend == nil {
+			break
+		}
+
+		return e.complexity.Categories.Frontend(childComplexity), true
+
+	case "Categories.machine_learning":
+		if e.complexity.Categories.MachineLearning == nil {
+			break
+		}
+
+		return e.complexity.Categories.MachineLearning(childComplexity), true
 
 	case "ContactInfo.about_me":
 		if e.complexity.ContactInfo.AboutMe == nil {
@@ -396,7 +431,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.UpdateSkills(childComplexity, args["input"].(model.InputTechnologies), args["email"].(string)), true
+		return e.complexity.Mutation.UpdateSkills(childComplexity, args["input"].(model.InputTechnologies), args["category"].(string), args["email"].(string)), true
 
 	case "ProfileQL.contact":
 		if e.complexity.ProfileQL.Contact == nil {
@@ -517,6 +552,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
 		ec.unmarshalInputInputApplication,
+		ec.unmarshalInputInputCategories,
 		ec.unmarshalInputInputContactInfo,
 		ec.unmarshalInputInputDateOfBirth,
 		ec.unmarshalInputInputExternalEmail,
@@ -593,7 +629,7 @@ type ProfileQL {
     last_name: String!
     dob: DateOfBirth!
     location: Location!
-    skills: [Technologies]
+    skills: Categories
     projects: [Application]
     contact: ContactInfo!
     experience: [Job]
@@ -637,6 +673,13 @@ type ContactInfo {
     about_my_career: String!
 }
 
+type Categories {
+    frontend: [Technologies]
+    backend: [Technologies]
+    machine_learning: [Technologies]
+    cloud_service: [Technologies]
+}
+
 type Technologies {
     tech_name: String!
     tech_link: String!
@@ -658,7 +701,7 @@ input InputProfile {
     first_name: String
     last_name: String
     location: InputLocation
-    skills: [InputTechnologies]
+    skills: InputCategories
     dob: InputDateOfBirth
     projects: [InputApplication]
     contact: InputContactInfo
@@ -679,6 +722,13 @@ input InputExternalEmail {
     email_address: String!
     email_subject: String!
     email_message: String!
+}
+
+input InputCategories {
+    frontend: [InputTechnologies]
+    backend: [InputTechnologies]
+    machine_learning: [InputTechnologies]
+    cloud_service: [InputTechnologies]
 }
 
 input InputTechnologies {
@@ -727,7 +777,11 @@ type Query {
 type Mutation {
     createProfile(input: InputProfile!): ProfileQL!
     sendEmail(input: InputExternalEmail!): String!
-    updateSkills(input: InputTechnologies!, email: String!): ProfileQL!
+    updateSkills(
+        input: InputTechnologies!
+        category: String!
+        email: String!
+    ): ProfileQL!
     updateProjects(input: InputApplication!, email: String!): ProfileQL!
     updateJob(input: InputJob!, email: String!): ProfileQL!
 }
@@ -830,14 +884,23 @@ func (ec *executionContext) field_Mutation_updateSkills_args(ctx context.Context
 	}
 	args["input"] = arg0
 	var arg1 string
-	if tmp, ok := rawArgs["email"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+	if tmp, ok := rawArgs["category"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
 		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["email"] = arg1
+	args["category"] = arg1
+	var arg2 string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg2, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["email"] = arg2
 	return args, nil
 }
 
@@ -1124,6 +1187,218 @@ func (ec *executionContext) fieldContext_Application_backend_description(ctx con
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Categories_frontend(ctx context.Context, field graphql.CollectedField, obj *model.Categories) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Categories_frontend(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Frontend, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Technologies)
+	fc.Result = res
+	return ec.marshalOTechnologies2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐTechnologies(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Categories_frontend(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Categories",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "tech_name":
+				return ec.fieldContext_Technologies_tech_name(ctx, field)
+			case "tech_link":
+				return ec.fieldContext_Technologies_tech_link(ctx, field)
+			case "image_url":
+				return ec.fieldContext_Technologies_image_url(ctx, field)
+			case "years_of_experience":
+				return ec.fieldContext_Technologies_years_of_experience(ctx, field)
+			case "tech_description":
+				return ec.fieldContext_Technologies_tech_description(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Technologies", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Categories_backend(ctx context.Context, field graphql.CollectedField, obj *model.Categories) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Categories_backend(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Backend, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Technologies)
+	fc.Result = res
+	return ec.marshalOTechnologies2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐTechnologies(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Categories_backend(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Categories",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "tech_name":
+				return ec.fieldContext_Technologies_tech_name(ctx, field)
+			case "tech_link":
+				return ec.fieldContext_Technologies_tech_link(ctx, field)
+			case "image_url":
+				return ec.fieldContext_Technologies_image_url(ctx, field)
+			case "years_of_experience":
+				return ec.fieldContext_Technologies_years_of_experience(ctx, field)
+			case "tech_description":
+				return ec.fieldContext_Technologies_tech_description(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Technologies", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Categories_machine_learning(ctx context.Context, field graphql.CollectedField, obj *model.Categories) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Categories_machine_learning(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.MachineLearning, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Technologies)
+	fc.Result = res
+	return ec.marshalOTechnologies2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐTechnologies(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Categories_machine_learning(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Categories",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "tech_name":
+				return ec.fieldContext_Technologies_tech_name(ctx, field)
+			case "tech_link":
+				return ec.fieldContext_Technologies_tech_link(ctx, field)
+			case "image_url":
+				return ec.fieldContext_Technologies_image_url(ctx, field)
+			case "years_of_experience":
+				return ec.fieldContext_Technologies_years_of_experience(ctx, field)
+			case "tech_description":
+				return ec.fieldContext_Technologies_tech_description(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Technologies", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Categories_cloud_service(ctx context.Context, field graphql.CollectedField, obj *model.Categories) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Categories_cloud_service(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CloudService, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Technologies)
+	fc.Result = res
+	return ec.marshalOTechnologies2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐTechnologies(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Categories_cloud_service(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Categories",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "tech_name":
+				return ec.fieldContext_Technologies_tech_name(ctx, field)
+			case "tech_link":
+				return ec.fieldContext_Technologies_tech_link(ctx, field)
+			case "image_url":
+				return ec.fieldContext_Technologies_image_url(ctx, field)
+			case "years_of_experience":
+				return ec.fieldContext_Technologies_years_of_experience(ctx, field)
+			case "tech_description":
+				return ec.fieldContext_Technologies_tech_description(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Technologies", field.Name)
 		},
 	}
 	return fc, nil
@@ -2239,7 +2514,7 @@ func (ec *executionContext) _Mutation_updateSkills(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().UpdateSkills(rctx, fc.Args["input"].(model.InputTechnologies), fc.Args["email"].(string))
+		return ec.resolvers.Mutation().UpdateSkills(rctx, fc.Args["input"].(model.InputTechnologies), fc.Args["category"].(string), fc.Args["email"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -2661,9 +2936,9 @@ func (ec *executionContext) _ProfileQL_skills(ctx context.Context, field graphql
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*model.Technologies)
+	res := resTmp.(*model.Categories)
 	fc.Result = res
-	return ec.marshalOTechnologies2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐTechnologies(ctx, field.Selections, res)
+	return ec.marshalOCategories2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐCategories(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_ProfileQL_skills(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2674,18 +2949,16 @@ func (ec *executionContext) fieldContext_ProfileQL_skills(ctx context.Context, f
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "tech_name":
-				return ec.fieldContext_Technologies_tech_name(ctx, field)
-			case "tech_link":
-				return ec.fieldContext_Technologies_tech_link(ctx, field)
-			case "image_url":
-				return ec.fieldContext_Technologies_image_url(ctx, field)
-			case "years_of_experience":
-				return ec.fieldContext_Technologies_years_of_experience(ctx, field)
-			case "tech_description":
-				return ec.fieldContext_Technologies_tech_description(ctx, field)
+			case "frontend":
+				return ec.fieldContext_Categories_frontend(ctx, field)
+			case "backend":
+				return ec.fieldContext_Categories_backend(ctx, field)
+			case "machine_learning":
+				return ec.fieldContext_Categories_machine_learning(ctx, field)
+			case "cloud_service":
+				return ec.fieldContext_Categories_cloud_service(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Technologies", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Categories", field.Name)
 		},
 	}
 	return fc, nil
@@ -5167,6 +5440,53 @@ func (ec *executionContext) unmarshalInputInputApplication(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputInputCategories(ctx context.Context, obj interface{}) (model.InputCategories, error) {
+	var it model.InputCategories
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "frontend":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("frontend"))
+			it.Frontend, err = ec.unmarshalOInputTechnologies2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputTechnologies(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "backend":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("backend"))
+			it.Backend, err = ec.unmarshalOInputTechnologies2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputTechnologies(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "machine_learning":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("machine_learning"))
+			it.MachineLearning, err = ec.unmarshalOInputTechnologies2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputTechnologies(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "cloud_service":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("cloud_service"))
+			it.CloudService, err = ec.unmarshalOInputTechnologies2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputTechnologies(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputInputContactInfo(ctx context.Context, obj interface{}) (model.InputContactInfo, error) {
 	var it model.InputContactInfo
 	asMap := map[string]interface{}{}
@@ -5455,7 +5775,7 @@ func (ec *executionContext) unmarshalInputInputProfile(ctx context.Context, obj 
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skills"))
-			it.Skills, err = ec.unmarshalOInputTechnologies2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputTechnologies(ctx, v)
+			it.Skills, err = ec.unmarshalOInputCategories2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputCategories(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5605,6 +5925,43 @@ func (ec *executionContext) _Application(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var categoriesImplementors = []string{"Categories"}
+
+func (ec *executionContext) _Categories(ctx context.Context, sel ast.SelectionSet, obj *model.Categories) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, categoriesImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Categories")
+		case "frontend":
+
+			out.Values[i] = ec._Categories_frontend(ctx, field, obj)
+
+		case "backend":
+
+			out.Values[i] = ec._Categories_backend(ctx, field, obj)
+
+		case "machine_learning":
+
+			out.Values[i] = ec._Categories_machine_learning(ctx, field, obj)
+
+		case "cloud_service":
+
+			out.Values[i] = ec._Categories_cloud_service(ctx, field, obj)
+
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6997,6 +7354,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) marshalOCategories2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐCategories(ctx context.Context, sel ast.SelectionSet, v *model.Categories) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Categories(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOInputApplication2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputApplication(ctx context.Context, v interface{}) ([]*model.InputApplication, error) {
 	if v == nil {
 		return nil, nil
@@ -7022,6 +7386,14 @@ func (ec *executionContext) unmarshalOInputApplication2ᚖgithubᚗcomᚋlazyspe
 		return nil, nil
 	}
 	res, err := ec.unmarshalInputInputApplication(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalOInputCategories2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputCategories(ctx context.Context, v interface{}) (*model.InputCategories, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputInputCategories(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 

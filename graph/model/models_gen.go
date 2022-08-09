@@ -10,6 +10,13 @@ type Application struct {
 	BackendDescription  string `json:"backend_description" bson:"backend_description"`
 }
 
+type Categories struct {
+	Frontend        []*Technologies `json:"frontend" bson:"frontend"`
+	Backend         []*Technologies `json:"backend" bson:"backend"`
+	MachineLearning []*Technologies `json:"machine_learning" bson:"machine_learning"`
+	CloudService    []*Technologies `json:"cloud_service" bson:"cloud_service"`
+}
+
 type ContactInfo struct {
 	PhoneNumber   string `json:"phone_number" bson:"phone_number"`
 	Email         string `json:"email" bson:"email"`
@@ -40,6 +47,13 @@ type InputApplication struct {
 	FrontendDescription string `json:"frontend_description" bson:"frontend_description"`
 	BackendLink         string `json:"backend_link" bson:"backend_link"`
 	BackendDescription  string `json:"backend_description" bson:"backend_description"`
+}
+
+type InputCategories struct {
+	Frontend        []*InputTechnologies `json:"frontend" bson:"frontend"`
+	Backend         []*InputTechnologies `json:"backend" bson:"backend"`
+	MachineLearning []*InputTechnologies `json:"machine_learning" bson:"machine_learning"`
+	CloudService    []*InputTechnologies `json:"cloud_service" bson:"cloud_service"`
 }
 
 type InputContactInfo struct {
@@ -80,14 +94,14 @@ type InputLocation struct {
 }
 
 type InputProfile struct {
-	FirstName  *string              `json:"first_name" bson:"first_name"`
-	LastName   *string              `json:"last_name" bson:"last_name"`
-	Location   *InputLocation       `json:"location" bson:"location"`
-	Skills     []*InputTechnologies `json:"skills" bson:"skills"`
-	Dob        *InputDateOfBirth    `json:"dob" bson:"dob"`
-	Projects   []*InputApplication  `json:"projects" bson:"projects"`
-	Contact    *InputContactInfo    `json:"contact" bson:"contact"`
-	Experience []*InputJob          `json:"experience" bson:"experience"`
+	FirstName  *string             `json:"first_name" bson:"first_name"`
+	LastName   *string             `json:"last_name" bson:"last_name"`
+	Location   *InputLocation      `json:"location" bson:"location"`
+	Skills     *InputCategories    `json:"skills" bson:"skills"`
+	Dob        *InputDateOfBirth   `json:"dob" bson:"dob"`
+	Projects   []*InputApplication `json:"projects" bson:"projects"`
+	Contact    *InputContactInfo   `json:"contact" bson:"contact"`
+	Experience []*InputJob         `json:"experience" bson:"experience"`
 }
 
 type InputTechnologies struct {
@@ -112,14 +126,14 @@ type Location struct {
 }
 
 type ProfileQl struct {
-	FirstName  string          `json:"first_name" bson:"first_name"`
-	LastName   string          `json:"last_name" bson:"last_name"`
-	Dob        *DateOfBirth    `json:"dob" bson:"dob"`
-	Location   *Location       `json:"location" bson:"location"`
-	Skills     []*Technologies `json:"skills" bson:"skills"`
-	Projects   []*Application  `json:"projects" bson:"projects"`
-	Contact    *ContactInfo    `json:"contact" bson:"contact"`
-	Experience []*Job          `json:"experience" bson:"experience"`
+	FirstName  string         `json:"first_name" bson:"first_name"`
+	LastName   string         `json:"last_name" bson:"last_name"`
+	Dob        *DateOfBirth   `json:"dob" bson:"dob"`
+	Location   *Location      `json:"location" bson:"location"`
+	Skills     *Categories    `json:"skills" bson:"skills"`
+	Projects   []*Application `json:"projects" bson:"projects"`
+	Contact    *ContactInfo   `json:"contact" bson:"contact"`
+	Experience []*Job         `json:"experience" bson:"experience"`
 }
 
 type Technologies struct {
