@@ -17,13 +17,21 @@ import (
 )
 
 func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputProfile) (*model.ProfileQl, error) {
+
+	newCategories := &model.Categories{
+		Frontend:        []*model.Technologies{},
+		Backend:         []*model.Technologies{},
+		MachineLearning: []*model.Technologies{},
+		CloudService:    []*model.Technologies{},
+	}
+
 	newProfile := &model.ProfileQl{
 		FirstName:  *input.FirstName,
 		LastName:   *input.LastName,
 		Dob:        (*model.DateOfBirth)(input.Dob),
 		Location:   (*model.Location)(input.Location),
 		Contact:    (*model.ContactInfo)(input.Contact),
-		Skills:     []*model.Technologies{},
+		Skills:     newCategories,
 		Projects:   []*model.Application{},
 		Experience: []*model.Job{},
 	}
@@ -65,7 +73,7 @@ func (r *mutationResolver) SendEmail(ctx context.Context, input model.InputExter
 	return "Success", err
 }
 
-func (r *mutationResolver) UpdateSkills(ctx context.Context, input model.InputTechnologies, email string) (*model.ProfileQl, error) {
+func (r *mutationResolver) UpdateSkills(ctx context.Context, input model.InputTechnologies, category string, email string) (*model.ProfileQl, error) {
 	inputSkills := &model.Technologies{
 		TechName:          input.TechName,
 		TechLink:          input.TechLink,
@@ -74,7 +82,7 @@ func (r *mutationResolver) UpdateSkills(ctx context.Context, input model.InputTe
 		TechDescription:   input.TechDescription,
 	}
 
-	results, err := handlers.Repo.UpdateSkills(*inputSkills, email)
+	results, err := handlers.Repo.UpdateSkills(*inputSkills, email, category)
 	if err != nil {
 		return &results, err
 	}
