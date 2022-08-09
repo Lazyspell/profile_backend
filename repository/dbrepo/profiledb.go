@@ -89,11 +89,13 @@ func (m *mongoDBRepo) FindProfileById(profileId string) (model.ProfileQl, error)
 	return profileResults, nil
 }
 
-func (m *mongoDBRepo) UpdateSkillsQL(technologies model.Technologies, email string) error {
+func (m *mongoDBRepo) UpdateSkillsQL(technologies model.Technologies, email string, category string) error {
 	call := m.DB.Database("profile_db").Collection("profile_collection")
 
 	query := bson.M{"contact.email": email}
-	update := bson.M{"$push": bson.M{"skills": technologies}}
+	location := fmt.Sprint("skills.", category)
+
+	update := bson.M{"$addToSet": bson.M{location: technologies}}
 
 	_, err := call.UpdateOne(context.TODO(), query, update)
 	if err != nil {

@@ -69,9 +69,9 @@ func (m *Repository) GetProfileByIdQL(profileId string) (model.ProfileQl, error)
 
 }
 
-func (m *Repository) UpdateSkills(technology model.Technologies, email string) (model.ProfileQl, error) {
+func (m *Repository) UpdateSkills(technology model.Technologies, email string, category string) (model.ProfileQl, error) {
 
-	err := m.DB.UpdateSkillsQL(technology, email)
+	err := m.DB.UpdateSkillsQL(technology, email, category)
 	if err != nil {
 		log.Fatal(err)
 	}
