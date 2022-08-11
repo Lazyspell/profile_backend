@@ -64,6 +64,7 @@ type Technologies {
     image_url: String!
     years_of_experience: Int!
     tech_description: String!
+    category: String!
 }
 
 type Job {
@@ -115,6 +116,7 @@ input InputTechnologies {
     image_link: String!
     years_of_experience: Int!
     tech_description: String!
+    category: String!
 }
 
 input InputApplication {
