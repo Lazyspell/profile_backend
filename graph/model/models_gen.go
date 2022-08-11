@@ -110,6 +110,7 @@ type InputTechnologies struct {
 	ImageLink         string `json:"image_link" bson:"image_link"`
 	YearsOfExperience int    `json:"years_of_experience" bson:"years_of_experience"`
 	TechDescription   string `json:"tech_description" bson:"tech_description"`
+	Category 		  string `json:"category" bson:"category"`
 }
 
 type Job struct {
@@ -142,4 +143,5 @@ type Technologies struct {
 	ImageURL          string `json:"image_url" bson:"image_url"`
 	YearsOfExperience int    `json:"years_of_experience" bson:"years_of_experience"`
 	TechDescription   string `json:"tech_description" bson:"tech_description"`
+	Category 		  string `json:"category" bson:"category"`
 }
