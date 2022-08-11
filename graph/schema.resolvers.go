@@ -17,7 +17,6 @@ import (
 )
 
 func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputProfile) (*model.ProfileQl, error) {
-
 	newCategories := &model.Categories{
 		Frontend:        []*model.Technologies{},
 		Backend:         []*model.Technologies{},
@@ -80,6 +79,7 @@ func (r *mutationResolver) UpdateSkills(ctx context.Context, input model.InputTe
 		ImageURL:          input.ImageLink,
 		YearsOfExperience: input.YearsOfExperience,
 		TechDescription:   input.TechDescription,
+		Category:          input.Category,
 	}
 
 	results, err := handlers.Repo.UpdateSkills(*inputSkills, email, category)
