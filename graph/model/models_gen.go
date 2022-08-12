@@ -111,6 +111,8 @@ type InputTechnologies struct {
 	YearsOfExperience int    `json:"years_of_experience" bson:"years_of_experience"`
 	TechDescription   string `json:"tech_description" bson:"tech_description"`
 	Category 		  string `json:"category" bson:"category"`
+	CategoryDescription string `json:"category_description" bson:"category_description"`
+
 }
 
 type Job struct {
@@ -144,4 +146,6 @@ type Technologies struct {
 	YearsOfExperience int    `json:"years_of_experience" bson:"years_of_experience"`
 	TechDescription   string `json:"tech_description" bson:"tech_description"`
 	Category 		  string `json:"category" bson:"category"`
+	CategoryDescription string `json:"category_description" bson:"category_description"`
+
 }

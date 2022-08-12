@@ -65,6 +65,7 @@ type Technologies {
     years_of_experience: Int!
     tech_description: String!
     category: String!
+    category_description: String!
 }
 
 type Job {
@@ -117,6 +118,7 @@ input InputTechnologies {
     years_of_experience: Int!
     tech_description: String!
     category: String!
+    category_description: String!
 }
 
 input InputApplication {

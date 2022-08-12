@@ -121,12 +121,13 @@ type ComplexityRoot struct {
 	}
 
 	Technologies struct {
-		Category          func(childComplexity int) int
-		ImageURL          func(childComplexity int) int
-		TechDescription   func(childComplexity int) int
-		TechLink          func(childComplexity int) int
-		TechName          func(childComplexity int) int
-		YearsOfExperience func(childComplexity int) int
+		Category            func(childComplexity int) int
+		CategoryDescription func(childComplexity int) int
+		ImageURL            func(childComplexity int) int
+		TechDescription     func(childComplexity int) int
+		TechLink            func(childComplexity int) int
+		TechName            func(childComplexity int) int
+		YearsOfExperience   func(childComplexity int) int
 	}
 }
 
@@ -516,6 +517,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Technologies.Category(childComplexity), true
 
+	case "Technologies.category_description":
+		if e.complexity.Technologies.CategoryDescription == nil {
+			break
+		}
+
+		return e.complexity.Technologies.CategoryDescription(childComplexity), true
+
 	case "Technologies.image_url":
 		if e.complexity.Technologies.ImageURL == nil {
 			break
@@ -695,6 +703,7 @@ type Technologies {
     years_of_experience: Int!
     tech_description: String!
     category: String!
+    category_description: String!
 }
 
 type Job {
@@ -747,6 +756,7 @@ input InputTechnologies {
     years_of_experience: Int!
     tech_description: String!
     category: String!
+    category_description: String!
 }
 
 input InputApplication {
@@ -1250,6 +1260,8 @@ func (ec *executionContext) fieldContext_Categories_frontend(ctx context.Context
 				return ec.fieldContext_Technologies_tech_description(ctx, field)
 			case "category":
 				return ec.fieldContext_Technologies_category(ctx, field)
+			case "category_description":
+				return ec.fieldContext_Technologies_category_description(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Technologies", field.Name)
 		},
@@ -1305,6 +1317,8 @@ func (ec *executionContext) fieldContext_Categories_backend(ctx context.Context,
 				return ec.fieldContext_Technologies_tech_description(ctx, field)
 			case "category":
 				return ec.fieldContext_Technologies_category(ctx, field)
+			case "category_description":
+				return ec.fieldContext_Technologies_category_description(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Technologies", field.Name)
 		},
@@ -1360,6 +1374,8 @@ func (ec *executionContext) fieldContext_Categories_machine_learning(ctx context
 				return ec.fieldContext_Technologies_tech_description(ctx, field)
 			case "category":
 				return ec.fieldContext_Technologies_category(ctx, field)
+			case "category_description":
+				return ec.fieldContext_Technologies_category_description(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Technologies", field.Name)
 		},
@@ -1415,6 +1431,8 @@ func (ec *executionContext) fieldContext_Categories_cloud_service(ctx context.Co
 				return ec.fieldContext_Technologies_tech_description(ctx, field)
 			case "category":
 				return ec.fieldContext_Technologies_category(ctx, field)
+			case "category_description":
+				return ec.fieldContext_Technologies_category_description(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Technologies", field.Name)
 		},
@@ -3662,6 +3680,50 @@ func (ec *executionContext) _Technologies_category(ctx context.Context, field gr
 }
 
 func (ec *executionContext) fieldContext_Technologies_category(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Technologies",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Technologies_category_description(ctx context.Context, field graphql.CollectedField, obj *model.Technologies) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Technologies_category_description(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CategoryDescription, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Technologies_category_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Technologies",
 		Field:      field,
@@ -5936,6 +5998,14 @@ func (ec *executionContext) unmarshalInputInputTechnologies(ctx context.Context,
 			if err != nil {
 				return it, err
 			}
+		case "category_description":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category_description"))
+			it.CategoryDescription, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -6581,6 +6651,13 @@ func (ec *executionContext) _Technologies(ctx context.Context, sel ast.Selection
 		case "category":
 
 			out.Values[i] = ec._Technologies_category(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "category_description":
+
+			out.Values[i] = ec._Technologies_category_description(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
