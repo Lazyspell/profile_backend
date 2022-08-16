@@ -33,6 +33,7 @@ func (r *mutationResolver) CreateProfile(ctx context.Context, input model.InputP
 		Skills:     newCategories,
 		Projects:   []*model.Application{},
 		Experience: []*model.Job{},
+		Quotes:     []*model.Quote{},
 	}
 
 	err := handlers.Repo.InsertProfilesQL(newProfile)
@@ -114,6 +115,20 @@ func (r *mutationResolver) UpdateJob(ctx context.Context, input model.InputJob, 
 	}
 
 	results, err := handlers.Repo.UpdateJob(*inputJobs, email)
+	if err != nil {
+		return &results, err
+	}
+	return &results, err
+}
+
+func (r *mutationResolver) UpdateQuotes(ctx context.Context, input model.InputQuote, email string) (*model.ProfileQl, error) {
+	inputQuotes := &model.Quote{
+		Saying:     input.Saying,
+		Source:     input.Source,
+		SourceLink: input.SourceLink,
+	}
+
+	results, err := handlers.Repo.UpdateQuotes(*inputQuotes, email)
 	if err != nil {
 		return &results, err
 	}

@@ -106,6 +106,22 @@ func (m *mongoDBRepo) UpdateSkillsQL(technologies model.Technologies, email stri
 	return nil
 }
 
+func (m *mongoDBRepo) UpdateQuotes(quotes model.Quote, email string) error {
+	call := m.DB.Database("profile_db").Collection("profile_collection")
+
+	query := bson.M{"contact.email": email}
+
+	update := bson.M{"$addToSet": bson.M{"quotes": quotes}}
+
+	_, err := call.UpdateOne(context.TODO(), query, update)
+	if err != nil {
+		fmt.Println("failed")
+		fmt.Println(err)
+		return err
+	}
+	return nil
+}
+
 func (m *mongoDBRepo) UpdateProjectsQL(application model.Application, email string) error {
 	call := m.DB.Database("profile_db").Collection("profile_collection")
 

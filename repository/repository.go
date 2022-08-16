@@ -17,4 +17,5 @@ type DatabaseRepo interface {
 	UpdateSkillsQL(technologies model.Technologies, email string, category string) error
 	UpdateProjectsQL(application model.Application, email string) error
 	UpdateJobQL(job model.Job, email string) error
+	UpdateQuotes(quotes model.Quote, email string) error
 }
