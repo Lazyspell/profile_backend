@@ -11,12 +11,19 @@ type ProfileQL {
     projects: [Application]
     contact: ContactInfo!
     experience: [Job]
+    quotes: [Quote]
 }
 
 type Location {
     state: String!
     city: String!
     zip_code: Int!
+}
+
+type Quote {
+    saying: String!
+    source: String!
+    source_link: String!
 }
 
 type DateOfBirth {
@@ -86,6 +93,13 @@ input InputProfile {
     projects: [InputApplication]
     contact: InputContactInfo
     experience: [InputJob]
+    quotes: [InputQuote]
+}
+
+input InputQuote {
+    saying: String!
+    source: String!
+    source_link: String!
 }
 
 input InputContactInfo {
@@ -166,4 +180,5 @@ type Mutation {
     ): ProfileQL!
     updateProjects(input: InputApplication!, email: String!): ProfileQL!
     updateJob(input: InputJob!, email: String!): ProfileQL!
+    updateQuotes(input: InputQuote!, email: String!): ProfileQL!
 }

@@ -102,6 +102,7 @@ type InputProfile struct {
 	Projects   []*InputApplication `json:"projects" bson:"projects"`
 	Contact    *InputContactInfo   `json:"contact" bson:"contact"`
 	Experience []*InputJob         `json:"experience" bson:"experience"`
+	Quotes     []*InputQuote       `json:"quotes" bson:"quotes"`
 }
 
 type InputTechnologies struct {
@@ -113,6 +114,12 @@ type InputTechnologies struct {
 	Category 		  string `json:"category" bson:"category"`
 	CategoryDescription string `json:"category_description" bson:"category_description"`
 
+}
+
+type InputQuote struct {
+	Saying     string `json:"saying" bson:"saying"`
+	Source     string `json:"source" bson:"source"`
+	SourceLink string `json:"source_link" bson:"source_link"`
 }
 
 type Job struct {
@@ -137,6 +144,7 @@ type ProfileQl struct {
 	Projects   []*Application `json:"projects" bson:"projects"`
 	Contact    *ContactInfo   `json:"contact" bson:"contact"`
 	Experience []*Job         `json:"experience" bson:"experience"`
+	Quotes     []*Quote  	  `json:"quotes" bson:"quotes"`
 }
 
 type Technologies struct {
@@ -148,4 +156,10 @@ type Technologies struct {
 	Category 		  string `json:"category" bson:"category"`
 	CategoryDescription string `json:"category_description" bson:"category_description"`
 
+}
+
+type Quote struct {
+	Saying     string `json:"saying" bson:"saying"`
+	Source     string `json:"source" bson:"source"`
+	SourceLink string `json:"source_link" bson:"source_link"`
 }

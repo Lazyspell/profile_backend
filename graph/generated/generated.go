@@ -101,6 +101,7 @@ type ComplexityRoot struct {
 		SendEmail      func(childComplexity int, input model.InputExternalEmail) int
 		UpdateJob      func(childComplexity int, input model.InputJob, email string) int
 		UpdateProjects func(childComplexity int, input model.InputApplication, email string) int
+		UpdateQuotes   func(childComplexity int, input model.InputQuote, email string) int
 		UpdateSkills   func(childComplexity int, input model.InputTechnologies, category string, email string) int
 	}
 
@@ -112,12 +113,19 @@ type ComplexityRoot struct {
 		LastName   func(childComplexity int) int
 		Location   func(childComplexity int) int
 		Projects   func(childComplexity int) int
+		Quotes     func(childComplexity int) int
 		Skills     func(childComplexity int) int
 	}
 
 	Query struct {
 		Profile   func(childComplexity int) int
 		ProfileID func(childComplexity int, email string) int
+	}
+
+	Quote struct {
+		Saying     func(childComplexity int) int
+		Source     func(childComplexity int) int
+		SourceLink func(childComplexity int) int
 	}
 
 	Technologies struct {
@@ -137,6 +145,7 @@ type MutationResolver interface {
 	UpdateSkills(ctx context.Context, input model.InputTechnologies, category string, email string) (*model.ProfileQl, error)
 	UpdateProjects(ctx context.Context, input model.InputApplication, email string) (*model.ProfileQl, error)
 	UpdateJob(ctx context.Context, input model.InputJob, email string) (*model.ProfileQl, error)
+	UpdateQuotes(ctx context.Context, input model.InputQuote, email string) (*model.ProfileQl, error)
 }
 type QueryResolver interface {
 	ProfileID(ctx context.Context, email string) (*model.ProfileQl, error)
@@ -423,6 +432,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.UpdateProjects(childComplexity, args["input"].(model.InputApplication), args["email"].(string)), true
 
+	case "Mutation.updateQuotes":
+		if e.complexity.Mutation.UpdateQuotes == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_updateQuotes_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.UpdateQuotes(childComplexity, args["input"].(model.InputQuote), args["email"].(string)), true
+
 	case "Mutation.updateSkills":
 		if e.complexity.Mutation.UpdateSkills == nil {
 			break
@@ -484,6 +505,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ProfileQL.Projects(childComplexity), true
 
+	case "ProfileQL.quotes":
+		if e.complexity.ProfileQL.Quotes == nil {
+			break
+		}
+
+		return e.complexity.ProfileQL.Quotes(childComplexity), true
+
 	case "ProfileQL.skills":
 		if e.complexity.ProfileQL.Skills == nil {
 			break
@@ -509,6 +537,27 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Query.ProfileID(childComplexity, args["email"].(string)), true
+
+	case "Quote.saying":
+		if e.complexity.Quote.Saying == nil {
+			break
+		}
+
+		return e.complexity.Quote.Saying(childComplexity), true
+
+	case "Quote.source":
+		if e.complexity.Quote.Source == nil {
+			break
+		}
+
+		return e.complexity.Quote.Source(childComplexity), true
+
+	case "Quote.source_link":
+		if e.complexity.Quote.SourceLink == nil {
+			break
+		}
+
+		return e.complexity.Quote.SourceLink(childComplexity), true
 
 	case "Technologies.category":
 		if e.complexity.Technologies.Category == nil {
@@ -575,6 +624,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputInputJob,
 		ec.unmarshalInputInputLocation,
 		ec.unmarshalInputInputProfile,
+		ec.unmarshalInputInputQuote,
 		ec.unmarshalInputInputTechnologies,
 	)
 	first := true
@@ -649,12 +699,19 @@ type ProfileQL {
     projects: [Application]
     contact: ContactInfo!
     experience: [Job]
+    quotes: [Quote]
 }
 
 type Location {
     state: String!
     city: String!
     zip_code: Int!
+}
+
+type Quote {
+    saying: String!
+    source: String!
+    source_link: String!
 }
 
 type DateOfBirth {
@@ -724,6 +781,13 @@ input InputProfile {
     projects: [InputApplication]
     contact: InputContactInfo
     experience: [InputJob]
+    quotes: [InputQuote]
+}
+
+input InputQuote {
+    saying: String!
+    source: String!
+    source_link: String!
 }
 
 input InputContactInfo {
@@ -804,6 +868,7 @@ type Mutation {
     ): ProfileQL!
     updateProjects(input: InputApplication!, email: String!): ProfileQL!
     updateJob(input: InputJob!, email: String!): ProfileQL!
+    updateQuotes(input: InputQuote!, email: String!): ProfileQL!
 }
 `, BuiltIn: false},
 }
@@ -874,6 +939,30 @@ func (ec *executionContext) field_Mutation_updateProjects_args(ctx context.Conte
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
 		arg0, err = ec.unmarshalNInputApplication2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputApplication(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["email"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["email"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_updateQuotes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 model.InputQuote
+	if tmp, ok := rawArgs["input"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
+		arg0, err = ec.unmarshalNInputQuote2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputQuote(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -2463,6 +2552,8 @@ func (ec *executionContext) fieldContext_Mutation_createProfile(ctx context.Cont
 				return ec.fieldContext_ProfileQL_contact(ctx, field)
 			case "experience":
 				return ec.fieldContext_ProfileQL_experience(ctx, field)
+			case "quotes":
+				return ec.fieldContext_ProfileQL_quotes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProfileQL", field.Name)
 		},
@@ -2591,6 +2682,8 @@ func (ec *executionContext) fieldContext_Mutation_updateSkills(ctx context.Conte
 				return ec.fieldContext_ProfileQL_contact(ctx, field)
 			case "experience":
 				return ec.fieldContext_ProfileQL_experience(ctx, field)
+			case "quotes":
+				return ec.fieldContext_ProfileQL_quotes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProfileQL", field.Name)
 		},
@@ -2664,6 +2757,8 @@ func (ec *executionContext) fieldContext_Mutation_updateProjects(ctx context.Con
 				return ec.fieldContext_ProfileQL_contact(ctx, field)
 			case "experience":
 				return ec.fieldContext_ProfileQL_experience(ctx, field)
+			case "quotes":
+				return ec.fieldContext_ProfileQL_quotes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProfileQL", field.Name)
 		},
@@ -2737,6 +2832,8 @@ func (ec *executionContext) fieldContext_Mutation_updateJob(ctx context.Context,
 				return ec.fieldContext_ProfileQL_contact(ctx, field)
 			case "experience":
 				return ec.fieldContext_ProfileQL_experience(ctx, field)
+			case "quotes":
+				return ec.fieldContext_ProfileQL_quotes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProfileQL", field.Name)
 		},
@@ -2749,6 +2846,81 @@ func (ec *executionContext) fieldContext_Mutation_updateJob(ctx context.Context,
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_updateJob_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_updateQuotes(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_updateQuotes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().UpdateQuotes(rctx, fc.Args["input"].(model.InputQuote), fc.Args["email"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.ProfileQl)
+	fc.Result = res
+	return ec.marshalNProfileQL2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐProfileQl(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_updateQuotes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "first_name":
+				return ec.fieldContext_ProfileQL_first_name(ctx, field)
+			case "last_name":
+				return ec.fieldContext_ProfileQL_last_name(ctx, field)
+			case "dob":
+				return ec.fieldContext_ProfileQL_dob(ctx, field)
+			case "location":
+				return ec.fieldContext_ProfileQL_location(ctx, field)
+			case "skills":
+				return ec.fieldContext_ProfileQL_skills(ctx, field)
+			case "projects":
+				return ec.fieldContext_ProfileQL_projects(ctx, field)
+			case "contact":
+				return ec.fieldContext_ProfileQL_contact(ctx, field)
+			case "experience":
+				return ec.fieldContext_ProfileQL_experience(ctx, field)
+			case "quotes":
+				return ec.fieldContext_ProfileQL_quotes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ProfileQL", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_updateQuotes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return
 	}
@@ -3164,6 +3336,55 @@ func (ec *executionContext) fieldContext_ProfileQL_experience(ctx context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _ProfileQL_quotes(ctx context.Context, field graphql.CollectedField, obj *model.ProfileQl) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_ProfileQL_quotes(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Quotes, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*model.Quote)
+	fc.Result = res
+	return ec.marshalOQuote2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐQuote(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_ProfileQL_quotes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ProfileQL",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "saying":
+				return ec.fieldContext_Quote_saying(ctx, field)
+			case "source":
+				return ec.fieldContext_Quote_source(ctx, field)
+			case "source_link":
+				return ec.fieldContext_Quote_source_link(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Quote", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_profileId(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_profileId(ctx, field)
 	if err != nil {
@@ -3219,6 +3440,8 @@ func (ec *executionContext) fieldContext_Query_profileId(ctx context.Context, fi
 				return ec.fieldContext_ProfileQL_contact(ctx, field)
 			case "experience":
 				return ec.fieldContext_ProfileQL_experience(ctx, field)
+			case "quotes":
+				return ec.fieldContext_ProfileQL_quotes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProfileQL", field.Name)
 		},
@@ -3292,6 +3515,8 @@ func (ec *executionContext) fieldContext_Query_profile(ctx context.Context, fiel
 				return ec.fieldContext_ProfileQL_contact(ctx, field)
 			case "experience":
 				return ec.fieldContext_ProfileQL_experience(ctx, field)
+			case "quotes":
+				return ec.fieldContext_ProfileQL_quotes(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ProfileQL", field.Name)
 		},
@@ -3423,6 +3648,138 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Quote_saying(ctx context.Context, field graphql.CollectedField, obj *model.Quote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Quote_saying(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Saying, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Quote_saying(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Quote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Quote_source(ctx context.Context, field graphql.CollectedField, obj *model.Quote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Quote_source(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Source, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Quote_source(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Quote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Quote_source_link(ctx context.Context, field graphql.CollectedField, obj *model.Quote) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Quote_source_link(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SourceLink, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Quote_source_link(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Quote",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5935,6 +6292,53 @@ func (ec *executionContext) unmarshalInputInputProfile(ctx context.Context, obj 
 			if err != nil {
 				return it, err
 			}
+		case "quotes":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quotes"))
+			it.Quotes, err = ec.unmarshalOInputQuote2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputQuote(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputInputQuote(ctx context.Context, obj interface{}) (model.InputQuote, error) {
+	var it model.InputQuote
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "saying":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("saying"))
+			it.Saying, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "source":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source"))
+			it.Source, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "source_link":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("source_link"))
+			it.SourceLink, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -6436,6 +6840,15 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		case "updateQuotes":
+
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_updateQuotes(ctx, field)
+			})
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -6503,6 +6916,10 @@ func (ec *executionContext) _ProfileQL(ctx context.Context, sel ast.SelectionSet
 		case "experience":
 
 			out.Values[i] = ec._ProfileQL_experience(ctx, field, obj)
+
+		case "quotes":
+
+			out.Values[i] = ec._ProfileQL_quotes(ctx, field, obj)
 
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -6592,6 +7009,48 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				return ec._Query___schema(ctx, field)
 			})
 
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var quoteImplementors = []string{"Quote"}
+
+func (ec *executionContext) _Quote(ctx context.Context, sel ast.SelectionSet, obj *model.Quote) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, quoteImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Quote")
+		case "saying":
+
+			out.Values[i] = ec._Quote_saying(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "source":
+
+			out.Values[i] = ec._Quote_source(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "source_link":
+
+			out.Values[i] = ec._Quote_source_link(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -7043,6 +7502,11 @@ func (ec *executionContext) unmarshalNInputJob2githubᚗcomᚋlazyspellᚋprofil
 
 func (ec *executionContext) unmarshalNInputProfile2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputProfile(ctx context.Context, v interface{}) (model.InputProfile, error) {
 	res, err := ec.unmarshalInputInputProfile(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) unmarshalNInputQuote2githubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputQuote(ctx context.Context, v interface{}) (model.InputQuote, error) {
+	res, err := ec.unmarshalInputInputQuote(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
@@ -7603,6 +8067,34 @@ func (ec *executionContext) unmarshalOInputLocation2ᚖgithubᚗcomᚋlazyspell�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalOInputQuote2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputQuote(ctx context.Context, v interface{}) ([]*model.InputQuote, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*model.InputQuote, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalOInputQuote2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputQuote(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOInputQuote2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputQuote(ctx context.Context, v interface{}) (*model.InputQuote, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputInputQuote(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOInputTechnologies2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐInputTechnologies(ctx context.Context, v interface{}) ([]*model.InputTechnologies, error) {
 	if v == nil {
 		return nil, nil
@@ -7677,6 +8169,54 @@ func (ec *executionContext) marshalOJob2ᚖgithubᚗcomᚋlazyspellᚋprofile_ba
 		return graphql.Null
 	}
 	return ec._Job(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOQuote2ᚕᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐQuote(ctx context.Context, sel ast.SelectionSet, v []*model.Quote) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOQuote2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐQuote(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOQuote2ᚖgithubᚗcomᚋlazyspellᚋprofile_backendᚋgraphᚋmodelᚐQuote(ctx context.Context, sel ast.SelectionSet, v *model.Quote) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Quote(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {
