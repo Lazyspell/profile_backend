@@ -116,3 +116,18 @@ func (m *Repository) UpdateJob(job model.Job, email string) (model.ProfileQl, er
 	return results, err
 
 }
+
+func (m *Repository) UpdateQuotes(quotes model.Quote, email string) (model.ProfileQl, error) {
+
+	err := m.DB.UpdateQuotes(quotes, email)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	results, err := m.DB.FindProfileById(email)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return results, err
+}
