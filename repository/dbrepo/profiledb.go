@@ -126,7 +126,7 @@ func (m *mongoDBRepo) UpdateProjectsQL(application model.Application, email stri
 	call := m.DB.Database("profile_db").Collection("profile_collection")
 
 	query := bson.M{"contact.email": email}
-	update := bson.M{"$push": bson.M{"projects": application}}
+	update := bson.M{"$addToSet": bson.M{"projects": application}}
 
 	_, err := call.UpdateOne(context.TODO(), query, update)
 	if err != nil {
@@ -141,7 +141,7 @@ func (m *mongoDBRepo) UpdateJobQL(job model.Job, email string) error {
 	call := m.DB.Database("profile_db").Collection("profile_collection")
 
 	query := bson.M{"contact.email": email}
-	update := bson.M{"$push": bson.M{"experience": job}}
+	update := bson.M{"$addToSet": bson.M{"experience": job}}
 
 	_, err := call.UpdateOne(context.TODO(), query, update)
 	if err != nil {
