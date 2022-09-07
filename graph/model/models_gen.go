@@ -8,6 +8,7 @@ type Application struct {
 	FrontendDescription string `json:"frontend_description" bson:"frontend_description"`
 	BackendLink         string `json:"backend_link" bson:"backend_link"`
 	BackendDescription  string `json:"backend_description" bson:"backend_description"`
+	TechUsed        []string `json:"tech_used" bson:"tech_used"`
 }
 
 type Categories struct {
@@ -47,6 +48,7 @@ type InputApplication struct {
 	FrontendDescription string `json:"frontend_description" bson:"frontend_description"`
 	BackendLink         string `json:"backend_link" bson:"backend_link"`
 	BackendDescription  string `json:"backend_description" bson:"backend_description"`
+	TechUsed        []string `json:"tech_used" bson:"tech_used"`
 }
 
 type InputCategories struct {

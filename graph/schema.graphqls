@@ -39,6 +39,7 @@ type Application {
     frontend_description: String!
     backend_link: String!
     backend_description: String!
+    tech_used: [String!]!
 }
 
 type ExternalEmail {
@@ -141,6 +142,7 @@ input InputApplication {
     frontend_description: String!
     backend_link: String!
     backend_description: String!
+    tech_used: [String!]!
 }
 
 input InputJob {

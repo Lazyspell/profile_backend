@@ -50,6 +50,7 @@ type ComplexityRoot struct {
 		FrontendDescription func(childComplexity int) int
 		FrontendLink        func(childComplexity int) int
 		ProjectName         func(childComplexity int) int
+		TechUsed            func(childComplexity int) int
 	}
 
 	Categories struct {
@@ -201,6 +202,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Application.ProjectName(childComplexity), true
+
+	case "Application.tech_used":
+		if e.complexity.Application.TechUsed == nil {
+			break
+		}
+
+		return e.complexity.Application.TechUsed(childComplexity), true
 
 	case "Categories.backend":
 		if e.complexity.Categories.Backend == nil {
@@ -727,6 +735,7 @@ type Application {
     frontend_description: String!
     backend_link: String!
     backend_description: String!
+    tech_used: [String!]!
 }
 
 type ExternalEmail {
@@ -829,6 +838,7 @@ input InputApplication {
     frontend_description: String!
     backend_link: String!
     backend_description: String!
+    tech_used: [String!]!
 }
 
 input InputJob {
@@ -1289,6 +1299,50 @@ func (ec *executionContext) _Application_backend_description(ctx context.Context
 }
 
 func (ec *executionContext) fieldContext_Application_backend_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Application",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Application_tech_used(ctx context.Context, field graphql.CollectedField, obj *model.Application) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Application_tech_used(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TechUsed, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.([]string)
+	fc.Result = res
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Application_tech_used(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Application",
 		Field:      field,
@@ -3218,6 +3272,8 @@ func (ec *executionContext) fieldContext_ProfileQL_projects(ctx context.Context,
 				return ec.fieldContext_Application_backend_link(ctx, field)
 			case "backend_description":
 				return ec.fieldContext_Application_backend_description(ctx, field)
+			case "tech_used":
+				return ec.fieldContext_Application_tech_used(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Application", field.Name)
 		},
@@ -5915,6 +5971,14 @@ func (ec *executionContext) unmarshalInputInputApplication(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
+		case "tech_used":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tech_used"))
+			it.TechUsed, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -6465,6 +6529,13 @@ func (ec *executionContext) _Application(ctx context.Context, sel ast.SelectionS
 		case "backend_description":
 
 			out.Values[i] = ec._Application_backend_description(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "tech_used":
+
+			out.Values[i] = ec._Application_tech_used(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
