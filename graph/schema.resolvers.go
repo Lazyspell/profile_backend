@@ -97,6 +97,7 @@ func (r *mutationResolver) UpdateProjects(ctx context.Context, input model.Input
 		FrontendDescription: input.FrontendDescription,
 		BackendLink:         input.BackendLink,
 		BackendDescription:  input.BackendDescription,
+		TechUsed:            input.TechUsed,
 	}
 
 	results, err := handlers.Repo.UpdateProjects(*inputProjects, email)
