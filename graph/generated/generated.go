@@ -45,12 +45,10 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Application struct {
-		BackendDescription  func(childComplexity int) int
-		BackendLink         func(childComplexity int) int
-		FrontendDescription func(childComplexity int) int
-		FrontendLink        func(childComplexity int) int
-		ProjectName         func(childComplexity int) int
-		TechUsed            func(childComplexity int) int
+		ProjectDescription func(childComplexity int) int
+		ProjectLinks       func(childComplexity int) int
+		ProjectName        func(childComplexity int) int
+		TechUsed           func(childComplexity int) int
 	}
 
 	Categories struct {
@@ -168,33 +166,19 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Application.backend_description":
-		if e.complexity.Application.BackendDescription == nil {
+	case "Application.project_description":
+		if e.complexity.Application.ProjectDescription == nil {
 			break
 		}
 
-		return e.complexity.Application.BackendDescription(childComplexity), true
+		return e.complexity.Application.ProjectDescription(childComplexity), true
 
-	case "Application.backend_link":
-		if e.complexity.Application.BackendLink == nil {
+	case "Application.project_links":
+		if e.complexity.Application.ProjectLinks == nil {
 			break
 		}
 
-		return e.complexity.Application.BackendLink(childComplexity), true
-
-	case "Application.frontend_description":
-		if e.complexity.Application.FrontendDescription == nil {
-			break
-		}
-
-		return e.complexity.Application.FrontendDescription(childComplexity), true
-
-	case "Application.frontend_link":
-		if e.complexity.Application.FrontendLink == nil {
-			break
-		}
-
-		return e.complexity.Application.FrontendLink(childComplexity), true
+		return e.complexity.Application.ProjectLinks(childComplexity), true
 
 	case "Application.project_name":
 		if e.complexity.Application.ProjectName == nil {
@@ -731,10 +715,8 @@ type DateOfBirth {
 
 type Application {
     project_name: String!
-    frontend_link: String!
-    frontend_description: String!
-    backend_link: String!
-    backend_description: String!
+    project_description: String!
+    project_links: [String!]!
     tech_used: [String!]!
 }
 
@@ -834,10 +816,8 @@ input InputTechnologies {
 
 input InputApplication {
     project_name: String!
-    frontend_link: String!
-    frontend_description: String!
-    backend_link: String!
-    backend_description: String!
+    project_description: String!
+    project_links: [String!]!
     tech_used: [String!]!
 }
 
@@ -1135,8 +1115,8 @@ func (ec *executionContext) fieldContext_Application_project_name(ctx context.Co
 	return fc, nil
 }
 
-func (ec *executionContext) _Application_frontend_link(ctx context.Context, field graphql.CollectedField, obj *model.Application) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Application_frontend_link(ctx, field)
+func (ec *executionContext) _Application_project_description(ctx context.Context, field graphql.CollectedField, obj *model.Application) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Application_project_description(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1149,7 +1129,7 @@ func (ec *executionContext) _Application_frontend_link(ctx context.Context, fiel
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.FrontendLink, nil
+		return obj.ProjectDescription, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1166,7 +1146,7 @@ func (ec *executionContext) _Application_frontend_link(ctx context.Context, fiel
 	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Application_frontend_link(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Application_project_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Application",
 		Field:      field,
@@ -1179,8 +1159,8 @@ func (ec *executionContext) fieldContext_Application_frontend_link(ctx context.C
 	return fc, nil
 }
 
-func (ec *executionContext) _Application_frontend_description(ctx context.Context, field graphql.CollectedField, obj *model.Application) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Application_frontend_description(ctx, field)
+func (ec *executionContext) _Application_project_links(ctx context.Context, field graphql.CollectedField, obj *model.Application) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Application_project_links(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1193,7 +1173,7 @@ func (ec *executionContext) _Application_frontend_description(ctx context.Contex
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.FrontendDescription, nil
+		return obj.ProjectLinks, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1205,100 +1185,12 @@ func (ec *executionContext) _Application_frontend_description(ctx context.Contex
 		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.([]string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalNString2ᚕstringᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Application_frontend_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Application",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Application_backend_link(ctx context.Context, field graphql.CollectedField, obj *model.Application) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Application_backend_link(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.BackendLink, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Application_backend_link(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Application",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Application_backend_description(ctx context.Context, field graphql.CollectedField, obj *model.Application) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Application_backend_description(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.BackendDescription, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Application_backend_description(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Application_project_links(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Application",
 		Field:      field,
@@ -3264,14 +3156,10 @@ func (ec *executionContext) fieldContext_ProfileQL_projects(ctx context.Context,
 			switch field.Name {
 			case "project_name":
 				return ec.fieldContext_Application_project_name(ctx, field)
-			case "frontend_link":
-				return ec.fieldContext_Application_frontend_link(ctx, field)
-			case "frontend_description":
-				return ec.fieldContext_Application_frontend_description(ctx, field)
-			case "backend_link":
-				return ec.fieldContext_Application_backend_link(ctx, field)
-			case "backend_description":
-				return ec.fieldContext_Application_backend_description(ctx, field)
+			case "project_description":
+				return ec.fieldContext_Application_project_description(ctx, field)
+			case "project_links":
+				return ec.fieldContext_Application_project_links(ctx, field)
 			case "tech_used":
 				return ec.fieldContext_Application_tech_used(ctx, field)
 			}
@@ -5939,35 +5827,19 @@ func (ec *executionContext) unmarshalInputInputApplication(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "frontend_link":
+		case "project_description":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("frontend_link"))
-			it.FrontendLink, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_description"))
+			it.ProjectDescription, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "frontend_description":
+		case "project_links":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("frontend_description"))
-			it.FrontendDescription, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "backend_link":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("backend_link"))
-			it.BackendLink, err = ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "backend_description":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("backend_description"))
-			it.BackendDescription, err = ec.unmarshalNString2string(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("project_links"))
+			it.ProjectLinks, err = ec.unmarshalNString2ᚕstringᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6505,30 +6377,16 @@ func (ec *executionContext) _Application(ctx context.Context, sel ast.SelectionS
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "frontend_link":
+		case "project_description":
 
-			out.Values[i] = ec._Application_frontend_link(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "frontend_description":
-
-			out.Values[i] = ec._Application_frontend_description(ctx, field, obj)
+			out.Values[i] = ec._Application_project_description(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
-		case "backend_link":
+		case "project_links":
 
-			out.Values[i] = ec._Application_backend_link(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "backend_description":
-
-			out.Values[i] = ec._Application_backend_description(ctx, field, obj)
+			out.Values[i] = ec._Application_project_links(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++

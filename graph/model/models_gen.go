@@ -4,11 +4,9 @@ package model
 
 type Application struct {
 	ProjectName         string `json:"project_name" bson:"project_name"`
-	FrontendLink        string `json:"frontend_link" bson:"frontend_link"`
-	FrontendDescription string `json:"frontend_description" bson:"frontend_description"`
-	BackendLink         string `json:"backend_link" bson:"backend_link"`
-	BackendDescription  string `json:"backend_description" bson:"backend_description"`
-	TechUsed        []string `json:"tech_used" bson:"tech_used"`
+	ProjectDescription  string `json:"project_description" bson:"project_description"`
+	ProjectLinks         []string `json:"project_links" bson:"project_links"`
+	TechUsed            []string `json:"tech_used" bson:"tech_used"`
 }
 
 type Categories struct {
@@ -44,11 +42,9 @@ type ExternalEmail struct {
 
 type InputApplication struct {
 	ProjectName         string `json:"project_name" bson:"project_name"`
-	FrontendLink        string `json:"frontend_link" bson:"frontend_link"`
-	FrontendDescription string `json:"frontend_description" bson:"frontend_description"`
-	BackendLink         string `json:"backend_link" bson:"backend_link"`
-	BackendDescription  string `json:"backend_description" bson:"backend_description"`
-	TechUsed        []string `json:"tech_used" bson:"tech_used"`
+	ProjectDescription  string `json:"project_description" bson:"project_description"`
+	ProjectLinks         []string `json:"project_links" bson:"project_links"`
+	TechUsed            []string `json:"tech_used" bson:"tech_used"`
 }
 
 type InputCategories struct {
