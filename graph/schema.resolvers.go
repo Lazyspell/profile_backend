@@ -92,12 +92,10 @@ func (r *mutationResolver) UpdateSkills(ctx context.Context, input model.InputTe
 
 func (r *mutationResolver) UpdateProjects(ctx context.Context, input model.InputApplication, email string) (*model.ProfileQl, error) {
 	inputProjects := &model.Application{
-		ProjectName:         input.ProjectName,
-		FrontendLink:        input.FrontendLink,
-		FrontendDescription: input.FrontendDescription,
-		BackendLink:         input.BackendLink,
-		BackendDescription:  input.BackendDescription,
-		TechUsed:            input.TechUsed,
+		ProjectName:        input.ProjectName,
+		ProjectDescription: input.ProjectDescription,
+		ProjectLinks:       input.ProjectLinks,
+		TechUsed:           input.TechUsed,
 	}
 
 	results, err := handlers.Repo.UpdateProjects(*inputProjects, email)

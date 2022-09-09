@@ -35,10 +35,8 @@ type DateOfBirth {
 
 type Application {
     project_name: String!
-    frontend_link: String!
-    frontend_description: String!
-    backend_link: String!
-    backend_description: String!
+    project_description: String!
+    project_links: [String!]!
     tech_used: [String!]!
 }
 
@@ -138,10 +136,8 @@ input InputTechnologies {
 
 input InputApplication {
     project_name: String!
-    frontend_link: String!
-    frontend_description: String!
-    backend_link: String!
-    backend_description: String!
+    project_description: String!
+    project_links: [String!]!
     tech_used: [String!]!
 }
 
