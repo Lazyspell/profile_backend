@@ -77,7 +77,8 @@ type Technologies {
 type Job {
     company_name: String!
     work_description: String!
-    years_worked: Int!
+    role: String!
+    years_worked: Int!/document/d/1ZV7XPupQ2Pqz5w-jLuRBZqqBBEKJeqO1PgenJrFCTME/edit
     tech_used: [String!]!
 }
 
@@ -144,6 +145,7 @@ input InputApplication {
 input InputJob {
     company_name: String!
     work_description: String!
+    role: String!
     years_worked: Int!
     tech_used: [String!]!
 }

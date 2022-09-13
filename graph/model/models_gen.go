@@ -81,6 +81,7 @@ type InputExternalEmail struct {
 type InputJob struct {
 	CompanyName     string   `json:"company_name" bson:"company_name"`
 	WorkDescription string   `json:"work_description" bson:"work_description"`
+	Role            string   `json:"role" bson:"role"`
 	YearsWorked     int      `json:"years_worked" bson:"years_worked"`
 	TechUsed        []string `json:"tech_used" bson:"tech_used"`
 }
@@ -123,6 +124,7 @@ type InputQuote struct {
 type Job struct {
 	CompanyName     string   `json:"company_name" bson:"company_name"`
 	WorkDescription string   `json:"work_description" bson:"work_description"`
+	Role            string   `json:"role" bson:"role"`
 	YearsWorked     int      `json:"years_worked" bson:"years_worked"`
 	TechUsed        []string `json:"tech_used" bson:"tech_used"`
 }
