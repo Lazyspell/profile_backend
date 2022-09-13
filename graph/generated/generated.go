@@ -84,6 +84,7 @@ type ComplexityRoot struct {
 
 	Job struct {
 		CompanyName     func(childComplexity int) int
+		Role            func(childComplexity int) int
 		TechUsed        func(childComplexity int) int
 		WorkDescription func(childComplexity int) int
 		YearsWorked     func(childComplexity int) int
@@ -333,6 +334,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Job.CompanyName(childComplexity), true
+
+	case "Job.role":
+		if e.complexity.Job.Role == nil {
+			break
+		}
+
+		return e.complexity.Job.Role(childComplexity), true
 
 	case "Job.tech_used":
 		if e.complexity.Job.TechUsed == nil {
@@ -757,6 +765,7 @@ type Technologies {
 type Job {
     company_name: String!
     work_description: String!
+    role: String!
     years_worked: Int!
     tech_used: [String!]!
 }
@@ -824,6 +833,7 @@ input InputApplication {
 input InputJob {
     company_name: String!
     work_description: String!
+    role: String!
     years_worked: Int!
     tech_used: [String!]!
 }
@@ -2223,6 +2233,50 @@ func (ec *executionContext) fieldContext_Job_work_description(ctx context.Contex
 	return fc, nil
 }
 
+func (ec *executionContext) _Job_role(ctx context.Context, field graphql.CollectedField, obj *model.Job) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Job_role(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Role, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Job_role(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Job",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Job_years_worked(ctx context.Context, field graphql.CollectedField, obj *model.Job) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Job_years_worked(ctx, field)
 	if err != nil {
@@ -3269,6 +3323,8 @@ func (ec *executionContext) fieldContext_ProfileQL_experience(ctx context.Contex
 				return ec.fieldContext_Job_company_name(ctx, field)
 			case "work_description":
 				return ec.fieldContext_Job_work_description(ctx, field)
+			case "role":
+				return ec.fieldContext_Job_role(ctx, field)
 			case "years_worked":
 				return ec.fieldContext_Job_years_worked(ctx, field)
 			case "tech_used":
@@ -6094,6 +6150,14 @@ func (ec *executionContext) unmarshalInputInputJob(ctx context.Context, obj inte
 			if err != nil {
 				return it, err
 			}
+		case "role":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("role"))
+			it.Role, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "years_worked":
 			var err error
 
@@ -6634,6 +6698,13 @@ func (ec *executionContext) _Job(ctx context.Context, sel ast.SelectionSet, obj 
 		case "work_description":
 
 			out.Values[i] = ec._Job_work_description(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "role":
+
+			out.Values[i] = ec._Job_role(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				invalids++

@@ -109,6 +109,7 @@ func (r *mutationResolver) UpdateJob(ctx context.Context, input model.InputJob, 
 	inputJobs := &model.Job{
 		CompanyName:     input.CompanyName,
 		WorkDescription: input.WorkDescription,
+		Role:            input.Role,
 		YearsWorked:     input.YearsWorked,
 		TechUsed:        input.TechUsed,
 	}
